@@ -12,12 +12,7 @@
       margin: 0;
       padding: 2rem;
     }
-
-    h1 {
-      text-align: center;
-      color: #333;
-    }
-
+    h1 { text-align: center; color: #333; }
     .section {
       background: white;
       padding: 2rem;
@@ -26,43 +21,22 @@
       box-shadow: 0 4px 12px rgba(0,0,0,0.1);
       max-width: 500px;
     }
-
-    .section h2 {
-      margin-top: 0;
-      color: #444;
-    }
-
+    .section h2 { margin-top: 0; color: #444; }
     .btn-group button {
-      background-color: gold;
-      color: white;
-      padding: 0.75rem 1.5rem;
-      border: none;
-      border-radius: 8px;
-      margin: 0.5rem;
-      cursor: pointer;
-      font-size: 1rem;
+      background-color: gold; color: white; padding: 0.75rem 1.5rem;
+      border: none; border-radius: 8px; margin: 0.5rem; cursor: pointer; font-size: 1rem;
     }
-
     input[type="number"] {
-      width: 100%;
-      padding: 0.5rem;
-      margin-top: 0.5rem;
-      font-size: 1rem;
-      border: 1px solid #ccc;
-      border-radius: 8px;
+      width: 100%; padding: 0.5rem; margin-top: 0.5rem;
+      font-size: 1rem; border: 1px solid #ccc; border-radius: 8px;
     }
-
     #remaining {
-      font-size: 1.2rem;
-      color: green;
-      margin-top: 1rem;
-      font-weight: bold;
+      font-size: 1.2rem; color: green; margin-top: 1rem; font-weight: bold;
     }
   </style>
 </head>
 <body>
   <h1>Admin Control Panel</h1>
-
   <div class="section">
     <h2>🎬 Control Phase</h2>
     <div class="btn-group">
@@ -71,7 +45,6 @@
       <button onclick="sendPhase(4)">Phase 4</button>
     </div>
   </div>
-
   <div class="section">
     <h2>🛍️ Shopping Budget</h2>
     <p>Enter store total:</p>
@@ -79,15 +52,10 @@
     <button onclick="addPurchase()">Submit</button>
     <div id="remaining">$100.00 remaining</div>
   </div>
-
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
   <script>
+    const supabase = supabase.createClient('https://bqrmdpuknvatplsalzlk.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJxcm1kcHVrbnZhdHBsc2FsemxrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM5MTY5NTEsImV4cCI6MjA2OTQ5Mjk1MX0.0BkkuelQ-8qW3OX-waPXHllFxYEziKq84FiJrGvWpYE');
     let budget = 100.00;
-
-    function sendPhase(phase) {
-      localStorage.setItem('currentPhase', phase);
-      alert('Phase ' + phase + ' sent!');
-    }
-
     function addPurchase() {
       const input = document.getElementById('storeAmount');
       const value = parseFloat(input.value);
@@ -101,8 +69,6 @@
         alert("Enter a valid number");
       }
     }
-
-    // Load remaining from localStorage if exists
     window.onload = function() {
       const stored = localStorage.getItem('remainingBudget');
       if (stored) {
@@ -110,6 +76,14 @@
         document.getElementById('remaining').innerText = `$${budget.toFixed(2)} remaining`;
       }
     };
+    async function sendPhase(phase) {
+      const { error } = await supabase
+        .from('phases')
+        .update({ current: phase })
+        .eq('id', 1);
+      if (!error) alert('Phase ' + phase + ' sent!');
+      else console.error(error);
+    }
   </script>
 </body>
 </html>
