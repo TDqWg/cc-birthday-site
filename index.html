@@ -1,9 +1,11 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>CC's Birthday Guide</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎂</text></svg>">
   <style>
     body {
       margin: 0;
@@ -23,6 +25,9 @@
 
     .hidden {
       display: none;
+      height: 0 !important;
+      overflow: hidden !important;
+      visibility: hidden;
     }
 
     .login {
@@ -32,7 +37,7 @@
       box-shadow: 0 4px 20px rgba(0,0,0,0.1);
     }
 
-    input[type="date"], input[type="number"], button {
+    input[type="date"], button {
       margin-top: 1rem;
       padding: 0.5rem 1rem;
       font-size: 1rem;
@@ -44,22 +49,6 @@
       background-color: gold;
       color: white;
       cursor: pointer;
-    }
-
-    #adminControls {
-      display: none;
-      position: fixed;
-      top: 10px;
-      left: 10px;
-      background: white;
-      padding: 1rem;
-      border-radius: 8px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.2);
-      z-index: 1001;
-    }
-
-    #adminControls input {
-      width: 80px;
     }
 
     #spinBtn {
@@ -77,11 +66,78 @@
       z-index: 999;
     }
 
+    #wheelModal {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.6);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      z-index: 1000;
+    }
+
+    #wheelContainer {
+      width: 300px;
+      height: 300px;
+      border-radius: 50%;
+      background: conic-gradient(gold 0% 25%, white 25% 50%, gold 50% 75%, white 75% 100%);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+    }
+
+    #wheelResult {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 2rem;
+      background: white;
+      padding: 1rem 2rem;
+      border-radius: 10px;
+      display: none;
+      z-index: 10;
+    }
+
+    #closeWheel {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      font-size: 1.5rem;
+      color: red;
+      cursor: pointer;
+      background: none;
+      border: none;
+    }
+
+    #timerText {
+      margin-top: 10px;
+      font-weight: bold;
+      color: white;
+    }
+
+    .envelope {
+      width: 300px;
+      height: 200px;
+      background: gold;
+      margin: 0 auto;
+      border-radius: 10px;
+      position: relative;
+      cursor: pointer;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: white;
+      font-size: 1.2rem;
+    }
+
     .letterContent {
       margin-top: 2rem;
       max-width: 600px;
       margin-left: auto;
       margin-right: auto;
+      display: none;
       background: white;
       padding: 2rem;
       border-radius: 10px;
@@ -100,7 +156,6 @@
     }
 
     #welcomeSection {
-      display: none;
       min-height: 100vh;
       background: url('kitty-bg.jpg') repeat;
       background-size: 300px;
@@ -127,20 +182,6 @@
       overflow: auto;
       text-shadow: 0 1px 1px #fff;
     }
-
-    .scrollText div {
-      max-width: 100%;
-    }
-
-    .budgetBox {
-      background: #fff3c4;
-      border: 2px solid gold;
-      padding: 1.5rem;
-      border-radius: 12px;
-      text-align: center;
-      font-size: 1.3rem;
-      margin-top: 2rem;
-    }
   </style>
 </head>
 <body>
@@ -148,15 +189,6 @@
     <h1>Enter Your Birthday</h1>
     <input type="date" id="dob" />
     <button onclick="checkBirthday()">Enter</button>
-  </div>
-
-  <div id="adminControls">
-    <p><strong>Admin Controls</strong></p>
-    <button onclick="goToPhase(2)">Phase 2</button>
-    <button onclick="goToPhase(3)">Phase 3</button>
-    <button onclick="goToPhase(4)">Phase 4</button><br>
-    <input type="number" id="spendInput" placeholder="Spent $">
-    <button onclick="subtractBudget()">Submit Purchase</button>
   </div>
 
   <button id="spinBtn" style="display:none" onclick="openWheel()">➶</button>
@@ -168,7 +200,7 @@
     <div id="timerText"></div>
   </div>
 
-  <section id="letterSection">
+  <section id="letterSection" class="hidden">
     <h2>Happy Birthday, CC!</h2>
     <div class="envelope" onclick="openEnvelope()">Click to open your letter</div>
     <div class="letterContent" id="letterText">
@@ -180,7 +212,7 @@
     </div>
   </section>
 
-  <section id="welcomeSection">
+  <section id="welcomeSection" class="hidden">
     <div class="scrollText">
       <div>
         <strong>WELCOME TO CC'S 17TH BIRTHDAY GUIDE</strong><br><br>
@@ -193,11 +225,11 @@
     </div>
   </section>
 
-  <section id="phase2Screen" class="centered">
+  <section id="phase2Screen" class="centered hidden">
     <h1>YOU CAN OPEN YOUR SHOES NOW! 🎉👟</h1>
   </section>
 
-  <section id="phase3Letter" class="centered">
+  <section id="phase3Letter" class="centered hidden">
     <div class="letterContent" style="display: block;">
       <p>Dear CC,</p>
       <p>I hope you’re enjoying the journey so far! Your next surprise is a delicious one — it’s time for lunch 🥪🍓</p>
@@ -205,34 +237,19 @@
     </div>
   </section>
 
-  <section id="phase4" class="centered" style="display: none;">
-    <div class="letterContent">
-      <p>Dear CC,</p>
-      <p>It’s time for one of the most exciting surprises of the day...</p>
-      <p>We’re going on a shopping spree! 🎁💸</p>
-      <p>Get ready to pick out anything you love — let’s make it fun!</p>
-    </div>
-    <div class="budgetBox">
-      Shopping Budget: <strong>$<span id="remaining">100.00</span></strong><br>
-      (Updated live by Admin)
-    </div>
-  </section>
-
   <script>
     const HER_BDAY = '2008-07-31';
     const YOUR_BDAY = '2006-08-24';
     let lastSpinTime = null;
-    let budget = 100;
 
     function checkBirthday() {
       const dob = document.getElementById('dob').value;
       if (dob === HER_BDAY) {
         document.querySelector('.login').style.display = 'none';
         document.getElementById('spinBtn').style.display = 'block';
-        document.getElementById('letterSection').style.display = 'block';
+        document.getElementById('letterSection').classList.remove('hidden');
       } else if (dob === YOUR_BDAY) {
-        document.querySelector('.login').style.display = 'none';
-        document.getElementById('adminControls').style.display = 'block';
+        window.location.href = '/admin.html';
       } else {
         alert("Incorrect birthday.");
       }
@@ -243,18 +260,16 @@
     }
 
     function goToWelcome() {
-      document.getElementById('letterSection').style.display = 'none';
-      document.getElementById('welcomeSection').style.display = 'flex';
+      document.getElementById('letterSection').classList.add('hidden');
+      document.getElementById('welcomeSection').classList.remove('hidden');
     }
 
     function goToPhase(phase) {
-      document.getElementById('welcomeSection').style.display = 'none';
-      document.getElementById('phase2Screen').style.display = 'none';
-      document.getElementById('phase3Letter').style.display = 'none';
-      document.getElementById('phase4').style.display = 'none';
-      if (phase === 2) document.getElementById('phase2Screen').style.display = 'flex';
-      if (phase === 3) document.getElementById('phase3Letter').style.display = 'flex';
-      if (phase === 4) document.getElementById('phase4').style.display = 'flex';
+      ['welcomeSection', 'phase2Screen', 'phase3Letter'].forEach(id => {
+        document.getElementById(id).classList.add('hidden');
+      });
+      if (phase === 2) document.getElementById('phase2Screen').classList.remove('hidden');
+      if (phase === 3) document.getElementById('phase3Letter').classList.remove('hidden');
     }
 
     function openWheel() {
@@ -284,16 +299,6 @@
 
     function closeWheel() {
       document.getElementById('wheelModal').style.display = 'none';
-    }
-
-    function subtractBudget() {
-      const val = parseFloat(document.getElementById('spendInput').value);
-      if (!isNaN(val) && val > 0) {
-        budget -= val;
-        if (budget < 0) budget = 0;
-        document.getElementById('remaining').innerText = budget.toFixed(2);
-        document.getElementById('spendInput').value = '';
-      }
     }
   </script>
 </body>
