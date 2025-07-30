@@ -1,10 +1,115 @@
+
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Admin Panel</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f5f5f5;
+      margin: 0;
+      padding: 2rem;
+    }
+
+    h1 {
+      text-align: center;
+      color: #333;
+    }
+
+    .section {
+      background: white;
+      padding: 2rem;
+      margin: 2rem auto;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      max-width: 500px;
+    }
+
+    .section h2 {
+      margin-top: 0;
+      color: #444;
+    }
+
+    .btn-group button {
+      background-color: gold;
+      color: white;
+      padding: 0.75rem 1.5rem;
+      border: none;
+      border-radius: 8px;
+      margin: 0.5rem;
+      cursor: pointer;
+      font-size: 1rem;
+    }
+
+    input[type="number"] {
+      width: 100%;
+      padding: 0.5rem;
+      margin-top: 0.5rem;
+      font-size: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+    }
+
+    #remaining {
+      font-size: 1.2rem;
+      color: green;
+      margin-top: 1rem;
+      font-weight: bold;
+    }
+  </style>
 </head>
 <body>
-  <h1>Welcome to Admin Control Panel</h1>
-  <p>Phase controls and budget will go here soon 🎛️</p>
+  <h1>Admin Control Panel</h1>
+
+  <div class="section">
+    <h2>🎬 Control Phase</h2>
+    <div class="btn-group">
+      <button onclick="sendPhase(2)">Phase 2</button>
+      <button onclick="sendPhase(3)">Phase 3</button>
+      <button onclick="sendPhase(4)">Phase 4</button>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>🛍️ Shopping Budget</h2>
+    <p>Enter store total:</p>
+    <input type="number" id="storeAmount" placeholder="e.g. 23.45" />
+    <button onclick="addPurchase()">Submit</button>
+    <div id="remaining">$100.00 remaining</div>
+  </div>
+
+  <script>
+    let budget = 100.00;
+
+    function sendPhase(phase) {
+      localStorage.setItem('currentPhase', phase);
+      alert('Phase ' + phase + ' sent!');
+    }
+
+    function addPurchase() {
+      const input = document.getElementById('storeAmount');
+      const value = parseFloat(input.value);
+      if (!isNaN(value) && value > 0) {
+        budget -= value;
+        budget = Math.max(0, budget);
+        document.getElementById('remaining').innerText = `$${budget.toFixed(2)} remaining`;
+        input.value = '';
+        localStorage.setItem('remainingBudget', budget);
+      } else {
+        alert("Enter a valid number");
+      }
+    }
+
+    // Load remaining from localStorage if exists
+    window.onload = function() {
+      const stored = localStorage.getItem('remainingBudget');
+      if (stored) {
+        budget = parseFloat(stored);
+        document.getElementById('remaining').innerText = `$${budget.toFixed(2)} remaining`;
+      }
+    };
+  </script>
 </body>
 </html>
