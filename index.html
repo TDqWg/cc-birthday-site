@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CC's Birthday Guide</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to bottom right, #fff9f2, #fdf6e3);
+      color: #333;
+      overflow-x: hidden;
+    }
+
+    .centered {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      flex-direction: column;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .login {
+      background: white;
+      padding: 2rem;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    }
+
+    input[type="date"], input[type="number"], button {
+      margin-top: 1rem;
+      padding: 0.5rem 1rem;
+      font-size: 1rem;
+      border: none;
+      border-radius: 6px;
+    }
+
+    button {
+      background-color: gold;
+      color: white;
+      cursor: pointer;
+    }
+
+    #adminControls {
+      display: none;
+      position: fixed;
+      top: 10px;
+      left: 10px;
+      background: white;
+      padding: 1rem;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.2);
+      z-index: 1001;
+    }
+
+    #adminControls input {
+      width: 80px;
+    }
+
+    #spinBtn {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background-color: gold;
+      border: none;
+      border-radius: 50%;
+      width: 60px;
+      height: 60px;
+      color: white;
+      font-size: 1.5rem;
+      cursor: pointer;
+      z-index: 999;
+    }
+
+    .letterContent {
+      margin-top: 2rem;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+      background: white;
+      padding: 2rem;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+
+    #videoPlaceholder {
+      margin-top: 2rem;
+      height: 200px;
+      background: #eee;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: #888;
+      border-radius: 12px;
+    }
+
+    #welcomeSection {
+      display: none;
+      min-height: 100vh;
+      background: url('kitty-bg.jpg') repeat;
+      background-size: 300px;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      padding: 2rem;
+    }
+
+    .scrollText {
+      background: url('scroll.png') no-repeat center;
+      background-size: contain;
+      width: 700px;
+      height: 800px;
+      padding: 6rem 5rem;
+      font-family: Georgia, serif;
+      font-size: 1rem;
+      line-height: 1.7;
+      color: #3b2d1f;
+      text-align: left;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: auto;
+      text-shadow: 0 1px 1px #fff;
+    }
+
+    .scrollText div {
+      max-width: 100%;
+    }
+
+    .budgetBox {
+      background: #fff3c4;
+      border: 2px solid gold;
+      padding: 1.5rem;
+      border-radius: 12px;
+      text-align: center;
+      font-size: 1.3rem;
+      margin-top: 2rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="centered login">
+    <h1>Enter Your Birthday</h1>
+    <input type="date" id="dob" />
+    <button onclick="checkBirthday()">Enter</button>
+  </div>
+
+  <div id="adminControls">
+    <p><strong>Admin Controls</strong></p>
+    <button onclick="goToPhase(2)">Phase 2</button>
+    <button onclick="goToPhase(3)">Phase 3</button>
+    <button onclick="goToPhase(4)">Phase 4</button><br>
+    <input type="number" id="spendInput" placeholder="Spent $">
+    <button onclick="subtractBudget()">Submit Purchase</button>
+  </div>
+
+  <button id="spinBtn" style="display:none" onclick="openWheel()">➶</button>
+
+  <div id="wheelModal">
+    <button id="closeWheel" onclick="closeWheel()">X</button>
+    <div id="wheelContainer" onclick="spinWheel()"></div>
+    <div id="wheelResult"></div>
+    <div id="timerText"></div>
+  </div>
+
+  <section id="letterSection">
+    <h2>Happy Birthday, CC!</h2>
+    <div class="envelope" onclick="openEnvelope()">Click to open your letter</div>
+    <div class="letterContent" id="letterText">
+      <p>Dear CC,</p>
+      <p>This is your special day, and there are so many surprises waiting for you! 💛</p>
+      <p>Scroll down to see what’s next...</p>
+      <div id="videoPlaceholder">[ Video Placeholder ]</div>
+      <button style="margin-top:2rem" onclick="goToWelcome()">Next</button>
+    </div>
+  </section>
+
+  <section id="welcomeSection">
+    <div class="scrollText">
+      <div>
+        <strong>WELCOME TO CC'S 17TH BIRTHDAY GUIDE</strong><br><br>
+        • Throughout the day, you will unlock special letters and surprises<br>
+        • Check the top-right corner to spin the surprise wheel every hour<br>
+        • Each section may include a video, a note, or something extra magical<br>
+        • The journey is paced for fun, so take your time and enjoy 💖<br>
+        • Don’t forget to smile. Today’s all about you 💫<br>
+      </div>
+    </div>
+  </section>
+
+  <section id="phase2Screen" class="centered">
+    <h1>YOU CAN OPEN YOUR SHOES NOW! 🎉👟</h1>
+  </section>
+
+  <section id="phase3Letter" class="centered">
+    <div class="letterContent" style="display: block;">
+      <p>Dear CC,</p>
+      <p>I hope you’re enjoying the journey so far! Your next surprise is a delicious one — it’s time for lunch 🥪🍓</p>
+      <p>You’ve earned it. Love you 💛</p>
+    </div>
+  </section>
+
+  <section id="phase4" class="centered" style="display: none;">
+    <div class="letterContent">
+      <p>Dear CC,</p>
+      <p>It’s time for one of the most exciting surprises of the day...</p>
+      <p>We’re going on a shopping spree! 🎁💸</p>
+      <p>Get ready to pick out anything you love — let’s make it fun!</p>
+    </div>
+    <div class="budgetBox">
+      Shopping Budget: <strong>$<span id="remaining">100.00</span></strong><br>
+      (Updated live by Admin)
+    </div>
+  </section>
+
+  <script>
+    const HER_BDAY = '2008-07-31';
+    const YOUR_BDAY = '2006-08-24';
+    let lastSpinTime = null;
+    let budget = 100;
+
+    function checkBirthday() {
+      const dob = document.getElementById('dob').value;
+      if (dob === HER_BDAY) {
+        document.querySelector('.login').style.display = 'none';
+        document.getElementById('spinBtn').style.display = 'block';
+        document.getElementById('letterSection').style.display = 'block';
+      } else if (dob === YOUR_BDAY) {
+        document.querySelector('.login').style.display = 'none';
+        document.getElementById('adminControls').style.display = 'block';
+      } else {
+        alert("Incorrect birthday.");
+      }
+    }
+
+    function openEnvelope() {
+      document.getElementById('letterText').style.display = 'block';
+    }
+
+    function goToWelcome() {
+      document.getElementById('letterSection').style.display = 'none';
+      document.getElementById('welcomeSection').style.display = 'flex';
+    }
+
+    function goToPhase(phase) {
+      document.getElementById('welcomeSection').style.display = 'none';
+      document.getElementById('phase2Screen').style.display = 'none';
+      document.getElementById('phase3Letter').style.display = 'none';
+      document.getElementById('phase4').style.display = 'none';
+      if (phase === 2) document.getElementById('phase2Screen').style.display = 'flex';
+      if (phase === 3) document.getElementById('phase3Letter').style.display = 'flex';
+      if (phase === 4) document.getElementById('phase4').style.display = 'flex';
+    }
+
+    function openWheel() {
+      const now = Date.now();
+      const hour = 1000 * 60 * 60;
+      if (lastSpinTime && now - lastSpinTime < hour) {
+        let mins = Math.floor((hour - (now - lastSpinTime)) / 60000);
+        document.getElementById('timerText').innerText = `You can spin again in ${mins} min`;
+        document.getElementById('wheelModal').style.display = 'flex';
+        return;
+      }
+      document.getElementById('timerText').innerText = '';
+      document.getElementById('wheelModal').style.display = 'flex';
+    }
+
+    function spinWheel() {
+      const prizes = ['Letter A', 'Letter B', 'Letter C', 'Bonus Surprise'];
+      const result = prizes[Math.floor(Math.random() * prizes.length)];
+      const resultBox = document.getElementById('wheelResult');
+      resultBox.innerText = result;
+      resultBox.style.display = 'block';
+      lastSpinTime = Date.now();
+      setTimeout(() => {
+        resultBox.style.display = 'none';
+      }, 10000);
+    }
+
+    function closeWheel() {
+      document.getElementById('wheelModal').style.display = 'none';
+    }
+
+    function subtractBudget() {
+      const val = parseFloat(document.getElementById('spendInput').value);
+      if (!isNaN(val) && val > 0) {
+        budget -= val;
+        if (budget < 0) budget = 0;
+        document.getElementById('remaining').innerText = budget.toFixed(2);
+        document.getElementById('spendInput').value = '';
+      }
+    }
+  </script>
+</body>
+</html>
