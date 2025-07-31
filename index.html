@@ -403,84 +403,101 @@
       }, 3000);
     }
 
-    async function fetchInitialPhase() {
+        async function fetchInitialPhase() {
       try {
-        // Check for locally stored phase first
+        // Try to fetch from Supabase first
+        if (supabase) {
+          console.log('Fetching initial phase from Supabase...');
+          const { data, error } = await supabase
+            .from('phases')
+            .select('current')
+            .eq('id', 1)
+            .single();
+          
+          if (!error && data) {
+            console.log('Supabase phase:', data.current);
+            showPhase(data.current);
+            localStorage.setItem('currentPhase', data.current);
+            return;
+          } else {
+            console.log('Supabase fetch failed:', error);
+          }
+        }
+        
+        // Fallback to local storage
         const localPhase = localStorage.getItem('currentPhase');
         if (localPhase) {
           console.log('Using locally stored phase:', localPhase);
           showPhase(parseInt(localPhase));
+        } else {
+          console.log('No phase found, showing welcome screen');
+          showPhase(1);
         }
-        
-        // Try to fetch from Supabase
-        const { data, error } = await supabase
-          .from('phases')
-          .select('current')
-          .eq('id', 1)
-          .single();
-        
-        if (error) {
-          console.error('Error fetching phase from Supabase:', error);
-          // If no local phase, show welcome
-          if (!localPhase) {
-            showPhase(1);
-          }
-          return;
-        }
-        
-        if (data) {
-          showPhase(data.current);
-          // Update local storage
-          localStorage.setItem('currentPhase', data.current);
-        }
-              } catch (error) {
-          console.error('Error in fetchInitialPhase:', error);
-          // If no local phase, show welcome
-          const localPhase = localStorage.getItem('currentPhase');
-          if (!localPhase) {
-            showPhase(1);
-          }
-        }
+      } catch (error) {
+        console.error('Error fetching initial phase:', error);
+        // Fallback to welcome screen
+        showPhase(1);
+      }
     }
 
-    async function listenForPhaseChanges() {
-      try {
-        // Create a more specific channel for phase changes
-        const channel = supabase.channel('phase-changes')
-          .on('postgres_changes', { 
-            event: 'UPDATE', 
-            schema: 'public', 
-            table: 'phases',
-            filter: 'id=eq.1' // Only listen to the specific row we care about
-          }, payload => {
-            console.log('Phase change detected:', payload);
-            const newPhase = payload.new.current;
-            console.log('Switching to phase:', newPhase);
-            showPhase(newPhase);
-            // Update local storage
-            localStorage.setItem('currentPhase', newPhase);
-          })
-          .subscribe((status) => {
-            console.log('Subscription status:', status);
-            if (status === 'SUBSCRIBED') {
-              console.log('Successfully subscribed to phase changes');
-            }
-          });
-      } catch (error) {
-        console.error('Error setting up phase listener:', error);
-        // Fallback: check for local phase changes periodically
-        setInterval(() => {
-          const localPhase = localStorage.getItem('currentPhase');
-          if (localPhase) {
-            const currentPhase = document.querySelector('#phase2Screen').style.display === 'flex' ? 2 :
-                               document.querySelector('#phase3Letter').style.display === 'flex' ? 3 :
-                               document.querySelector('#phase4Shopping').style.display === 'flex' ? 4 : 1;
+    function listenForPhaseChanges() {
+      // Check for local phase changes every second
+      setInterval(() => {
+        const localPhase = localStorage.getItem('currentPhase');
+        const phaseTimestamp = localStorage.getItem('phaseTimestamp');
+        
+        if (localPhase && phaseTimestamp) {
+          // Only update if the timestamp is recent (within last 30 seconds)
+          const now = Date.now();
+          const timestamp = parseInt(phaseTimestamp);
+          
+          if (now - timestamp < 30000) { // 30 seconds
+            const currentPhase = getCurrentPhase();
             if (parseInt(localPhase) !== currentPhase) {
+              console.log('Local phase change detected:', currentPhase, '->', localPhase);
               showPhase(parseInt(localPhase));
             }
           }
-        }, 5000); // Check every 5 seconds
+        }
+      }, 1000); // Check every second
+      
+      // Set up Supabase real-time listener for cross-device sync
+      if (supabase) {
+        try {
+          console.log('Setting up Supabase real-time listener...');
+          const channel = supabase.channel('phase-changes')
+            .on('postgres_changes', { 
+              event: 'UPDATE', 
+              schema: 'public', 
+              table: 'phases',
+              filter: 'id=eq.1'
+            }, payload => {
+              console.log('Supabase phase change detected:', payload);
+              const newPhase = payload.new.current;
+              showPhase(newPhase);
+              localStorage.setItem('currentPhase', newPhase);
+              localStorage.setItem('phaseTimestamp', Date.now());
+              showPhaseNotification(`Phase ${newPhase} received!`);
+            })
+            .subscribe((status) => {
+              console.log('Supabase subscription status:', status);
+              if (status === 'SUBSCRIBED') {
+                console.log('Successfully subscribed to Supabase real-time updates');
+              }
+            });
+        } catch (error) {
+          console.error('Supabase listener failed:', error);
+        }
+      } else {
+        console.log('Supabase not available, using local storage only');
       }
+    }
+    
+    function getCurrentPhase() {
+      if (document.querySelector('#phase2Screen').style.display === 'flex') return 2;
+      if (document.querySelector('#phase3Letter').style.display === 'flex') return 3;
+      if (document.querySelector('#phase4Shopping').style.display === 'flex') return 4;
+      return 1; // Welcome screen
     }
 
     function openWheel() {

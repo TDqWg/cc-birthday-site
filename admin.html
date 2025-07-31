@@ -61,9 +61,10 @@
         <button onclick="sendPhase(3)">Phase 3</button>
         <button onclick="sendPhase(4)">Phase 4</button>
       </div>
-      <button onclick="testConnection()" style="background: #007bff; margin-top: 1rem;">Test Connection</button>
+      <button onclick="testConnection()" style="background: #007bff; margin-top: 1rem;">Test Supabase</button>
       <button onclick="testBasicFunctionality()" style="background: #28a745; margin-top: 1rem;">Test Basic Functions</button>
       <button onclick="checkNetworkStatus()" style="background: #ffc107; margin-top: 1rem;">Check Network</button>
+      <button onclick="testPhaseSync()" style="background: #6f42c1; margin-top: 1rem;">Test Phase Sync</button>
       <div id="phaseStatus"></div>
       <div id="networkStatus" style="margin-top: 1rem; padding: 0.5rem; background: #f8f9fa; border-radius: 4px; font-size: 0.9rem;"></div>
     </div>
@@ -76,14 +77,14 @@
   </div>
   
   <script>
-    // Initialize Supabase client with proper error handling
+    // Initialize Supabase client
     let supabase;
     
     function initializeSupabase() {
       try {
         if (typeof window.supabase === 'undefined') {
-          console.error('Supabase not loaded! Check the script tag.');
-          throw new Error('Supabase library not loaded');
+          console.error('Supabase library not loaded!');
+          return false;
         }
         
         supabase = window.supabase.createClient(
@@ -94,21 +95,24 @@
         console.log('Supabase client initialized:', supabase);
         return true;
       } catch (error) {
-        console.error('Failed to initialize Supabase:', error);
-        showStatus(`Supabase initialization failed: ${error.message}`, 'error');
+        console.error('Supabase initialization failed:', error);
         return false;
       }
     }
     
-    // Try to initialize immediately
-    if (!initializeSupabase()) {
-      // If immediate initialization fails, try again after a delay
-      setTimeout(() => {
-        if (!initializeSupabase()) {
-          alert('Error: Could not initialize Supabase. Please refresh the page.');
-        }
-      }, 2000);
-    }
+    // Wait for DOM and script to load, then initialize
+    document.addEventListener('DOMContentLoaded', function() {
+      // Try to initialize immediately
+      if (!initializeSupabase()) {
+        // If it fails, try again after a short delay
+        setTimeout(() => {
+          if (!initializeSupabase()) {
+            console.error('Failed to initialize Supabase after retry');
+            showStatus('Warning: Supabase not available. Phase changes will only work on this device.', 'error');
+          }
+        }, 1000);
+      }
+    });
     
     let budget = 100.00;
 
@@ -126,21 +130,8 @@
         }
       }
       
-      // Ensure Supabase is initialized before testing
-      if (supabase) {
-        setTimeout(() => {
-          testConnection();
-        }, 1000);
-      } else {
-        // Wait a bit longer for Supabase to load
-        setTimeout(() => {
-          if (supabase) {
-            testConnection();
-          } else {
-            showStatus('Supabase not ready. Please refresh the page.', 'error');
-          }
-        }, 3000);
-      }
+      // Show that the admin panel is ready
+      showStatus('Admin panel ready! Phase buttons will work immediately.', 'success');
     });
 
     function addPurchase() {
@@ -159,61 +150,37 @@
 
     async function sendPhase(phase) {
       try {
-        console.log(`Attempting to send phase ${phase}...`);
+        console.log(`Setting phase to ${phase}...`);
         
-        if (!supabase) {
-          throw new Error('Supabase client not initialized');
-        }
+        // Store the phase in localStorage as backup
+        localStorage.setItem('currentPhase', phase);
+        localStorage.setItem('phaseTimestamp', Date.now());
         
-        console.log('Supabase client status:', supabase);
-        
-        // Create a timeout promise
-        const timeoutPromise = new Promise((_, reject) => {
-          setTimeout(() => reject(new Error('Request timeout - network may be slow')), 10000);
-        });
-        
-        // Test the connection first with timeout
-        const testPromise = supabase
-          .from('phases')
-          .select('*')
-          .eq('id', 1)
-          .single();
-        
-        const testResult = await Promise.race([testPromise, timeoutPromise]);
-        
-        console.log('Test query result:', testResult);
-        
-        if (testResult.error) {
-          throw new Error(`Connection test failed: ${testResult.error.message}`);
-        }
-        
-        // Update phase with timeout
-        const updatePromise = supabase
-          .from('phases')
-          .update({ current: phase })
-          .eq('id', 1)
-          .select();
-        
-        const { data, error } = await Promise.race([updatePromise, timeoutPromise]);
-        
-        if (!error) {
-          console.log('Phase update successful:', data);
-          showStatus(`Phase ${phase} sent successfully!`, 'success');
-          // Store locally as backup
-          localStorage.setItem('currentPhase', phase);
+        // Try to update Supabase first
+        if (supabase) {
+          console.log('Attempting to update Supabase...');
+          const { data, error } = await supabase
+            .from('phases')
+            .update({ current: phase })
+            .eq('id', 1)
+            .select();
+          
+          if (error) {
+            console.error('Supabase update failed:', error);
+            showStatus(`Error: ${error.message}`, 'error');
+            return;
+          } else {
+            console.log('Supabase updated successfully:', data);
+            showStatus(`Phase ${phase} sent successfully!`, 'success');
+          }
         } else {
-          console.error('Error updating phase:', error);
-          showStatus(`Error sending phase: ${error.message}`, 'error');
-          // Store locally as fallback
-          localStorage.setItem('currentPhase', phase);
-          showStatus(`Phase ${phase} stored locally as fallback`, 'success');
+          console.log('Supabase not available, using local storage only');
+          showStatus(`Phase ${phase} stored locally (no network sync)`, 'success');
         }
+        
       } catch (error) {
         console.error('Error in sendPhase:', error);
         showStatus(`Error sending phase: ${error.message}`, 'error');
-        // Store locally as fallback
-        localStorage.setItem('currentPhase', phase);
-        showStatus(`Phase ${phase} stored locally as fallback`, 'success');
       }
     }
 
@@ -342,6 +309,36 @@
         networkStatus.innerHTML = status;
       } catch (error) {
         networkStatus.innerHTML = `❌ Network check failed: ${error.message}`;
+      }
+    }
+
+    async function testPhaseSync() {
+      try {
+        showStatus('Testing phase sync...', 'success');
+        
+        // Test setting a phase
+        const testPhase = 2;
+        await sendPhase(testPhase);
+        
+        // Wait a moment, then check if it was saved
+        setTimeout(async () => {
+          if (supabase) {
+            const { data, error } = await supabase
+              .from('phases')
+              .select('current')
+              .eq('id', 1)
+              .single();
+            
+            if (!error && data && data.current === testPhase) {
+              showStatus('✅ Phase sync test successful!', 'success');
+            } else {
+              showStatus('❌ Phase sync test failed', 'error');
+            }
+          }
+        }, 2000);
+        
+      } catch (error) {
+        showStatus(`Phase sync test failed: ${error.message}`, 'error');
       }
     }
 
