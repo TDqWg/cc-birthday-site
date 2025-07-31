@@ -7,29 +7,231 @@
   <title>CC's Birthday Guide</title>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎂</text></svg>">
   <style>
-    body { margin: 0; font-family: 'Segoe UI', sans-serif; background: #fff9f2; color: #333; overflow-x: hidden; }
-    .centered { display: flex; justify-content: center; align-items: center; height: 100vh; flex-direction: column; }
-    .hidden { display: none; }
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to bottom right, #fff9f2, #fdf6e3);
+      color: #333;
+      overflow-x: hidden;
+    }
+    .centered {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      flex-direction: column;
+    }
+    .hidden {
+      display: none;
+    }
     .login {
-      background: white; padding: 2rem; border-radius: 12px;
+      background: white;
+      padding: 2rem;
+      border-radius: 12px;
       box-shadow: 0 4px 20px rgba(0,0,0,0.1);
     }
     input[type="date"], button {
-      margin-top: 1rem; padding: 0.5rem 1rem;
-      font-size: 1rem; border: none; border-radius: 6px;
+      margin-top: 1rem;
+      padding: 0.5rem 1rem;
+      font-size: 1rem;
+      border: none;
+      border-radius: 6px;
     }
-    button { background-color: gold; color: white; cursor: pointer; }
+    button {
+      background-color: gold;
+      color: white;
+      cursor: pointer;
+    }
+    #adminControls {
+      display: none;
+      position: fixed;
+      top: 10px;
+      left: 10px;
+      background: white;
+      padding: 1rem;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.2);
+      z-index: 1001;
+    }
+    #spinBtn {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background-color: gold;
+      border: none;
+      border-radius: 50%;
+      width: 60px;
+      height: 60px;
+      color: white;
+      font-size: 1.5rem;
+      cursor: pointer;
+      z-index: 999;
+    }
+    #wheelModal {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.6);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      z-index: 1000;
+    }
+    #wheelContainer {
+      width: 300px;
+      height: 300px;
+      border-radius: 50%;
+      background: conic-gradient(gold 0% 25%, white 25% 50%, gold 50% 75%, white 75% 100%);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+      animation: spin 0s linear;
+    }
+    #wheelResult {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 2rem;
+      background: white;
+      padding: 1rem 2rem;
+      border-radius: 10px;
+      display: none;
+      z-index: 10;
+    }
+    #closeWheel {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      font-size: 1.5rem;
+      color: red;
+      cursor: pointer;
+      background: none;
+      border: none;
+    }
+    #timerText {
+      margin-top: 10px;
+      font-weight: bold;
+      color: white;
+    }
+    #letterSection, #phase2Screen, #phase3Letter {
+      display: none;
+      padding: 3rem;
+      text-align: center;
+    }
+    .envelope {
+      width: 300px;
+      height: 200px;
+      background: gold;
+      margin: 0 auto;
+      border-radius: 10px;
+      position: relative;
+      cursor: pointer;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: white;
+      font-size: 1.2rem;
+    }
+    .letterContent {
+      margin-top: 2rem;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+      display: none;
+      background: white;
+      padding: 2rem;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    #videoPlaceholder {
+      margin-top: 2rem;
+      height: 200px;
+      background: #eee;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: #888;
+      border-radius: 12px;
+    }
+    #welcomeSection {
+      display: none;
+      min-height: 100vh;
+      background: url('kitty-bg.jpg') repeat;
+      background-size: 300px;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      padding: 2rem;
+    }
+    .scrollText {
+      background: url('scroll.png') no-repeat center;
+      background-size: contain;
+      width: 700px;
+      height: 800px;
+      padding: 6rem 5rem 6rem 5rem;
+      font-family: Georgia, serif;
+      font-size: 1rem;
+      line-height: 1.7;
+      color: #3b2d1f;
+      text-align: left;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: auto;
+      text-shadow: 0 1px 1px #fff;
+    }
+    .scrollText div { max-width: 100%; }
   </style>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
 </head>
 <body>
+<!-- body omitted for space, will continue in next cell -->
+
   <div class="centered login">
     <h1>Enter Your Birthday</h1>
     <input type="date" id="dob" />
     <button onclick="checkBirthday()">Enter</button>
   </div>
+
+  <button id="spinBtn" style="display:none" onclick="openWheel()">➶</button>
+
+  <div id="wheelModal">
+    <button id="closeWheel" onclick="closeWheel()">X</button>
+    <div id="wheelContainer" onclick="spinWheel()"></div>
+    <div id="wheelResult"></div>
+    <div id="timerText"></div>
+  </div>
+
+  <section id="letterSection">
+    <h2>Happy Birthday, CC!</h2>
+    <div class="envelope" onclick="openEnvelope()">Click to open your letter</div>
+    <div class="letterContent" id="letterText">
+      <p>Dear CC,</p>
+      <p>This is your special day, and there are so many surprises waiting for you! 💛</p>
+      <p>Scroll down to see what’s next...</p>
+      <div id="videoPlaceholder">[ Video Placeholder ]</div>
+      <button style="margin-top:2rem" onclick="goToWelcome()">Next</button>
+    </div>
+  </section>
+
+  <section id="welcomeSection">
+    <div class="scrollText">
+      <div>
+        <strong>WELCOME TO CC'S 17TH BIRTHDAY GUIDE</strong><br><br>
+        • Throughout the day, you will unlock special letters and surprises<br>
+        • Check the top-right corner to spin the surprise wheel every hour<br>
+        • Each section may include a video, a note, or something extra magical<br>
+        • The journey is paced for fun, so take your time and enjoy 💖<br>
+        • Don’t forget to smile. Today’s all about you 💫<br>
+      </div>
+    </div>
+  </section>
+
   <section id="phase2Screen" class="centered hidden">
     <h1>YOU CAN OPEN YOUR SHOES NOW! 🎉👟</h1>
   </section>
+
   <section id="phase3Letter" class="centered hidden">
     <div class="letterContent">
       <p>Dear CC,</p>
@@ -37,50 +239,99 @@
       <p>You’ve earned it. Love you 💛</p>
     </div>
   </section>
+
   <section id="phase4Shopping" class="centered hidden">
     <div class="letterContent">
       <p>Dear CC,</p>
       <p>It’s shopping time! 🎁🛍️ You have $100 to spend on whatever makes you smile. Let’s make this spree unforgettable!</p>
     </div>
   </section>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+
   <script>
-    const supabase = supabase.createClient('https://bqrmdpuknvatplsalzlk.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJxcm1kcHVrbnZhdHBsc2FsemxrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM5MTY5NTEsImV4cCI6MjA2OTQ5Mjk1MX0.0BkkuelQ-8qW3OX-waPXHllFxYEziKq84FiJrGvWpYE');
+    const supabase = supabase.createClient(
+      'https://bqrmdpuknvatplszalkz.supabase.co',
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJxcm1kcHVrbnZhdHBsc2FsemxrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM5MTY5NTEsImV4cCI6MjA2OTQ5Mjk1MX0.0BkkuelQ-8qW3OX-waPXHllFxYEziKq84FiJrGvWpYE'
+    );
+
+    const HER_BDAY = '2008-07-31';
+    const YOUR_BDAY = '2006-08-24';
+    let lastSpinTime = null;
+
     function checkBirthday() {
       const dob = document.getElementById('dob').value;
-      if (dob === '2008-07-31') {
+      if (dob === HER_BDAY) {
         document.querySelector('.login').style.display = 'none';
-      } else if (dob === '2006-08-24') {
+        document.getElementById('spinBtn').style.display = 'block';
+        document.getElementById('letterSection').style.display = 'block';
+        fetchInitialPhase();
+        listenForPhaseChanges();
+      } else if (dob === YOUR_BDAY) {
         window.location.href = '/admin.html';
       } else {
         alert("Incorrect birthday.");
       }
     }
-    function showPhase(phase) {
-      ['phase2Screen', 'phase3Letter', 'phase4Shopping'].forEach(id => {
-        const el = document.getElementById(id);
-        if (el) el.classList.add('hidden');
-      });
-      if (phase === 2) document.getElementById('phase2Screen')?.classList.remove('hidden');
-      if (phase === 3) document.getElementById('phase3Letter')?.classList.remove('hidden');
-      if (phase === 4) document.getElementById('phase4Shopping')?.classList.remove('hidden');
+
+    function openEnvelope() {
+      document.getElementById('letterText').style.display = 'block';
     }
+
+    function goToWelcome() {
+      document.getElementById('letterSection').style.display = 'none';
+      document.getElementById('welcomeSection').style.display = 'flex';
+    }
+
+    function showPhase(phase) {
+      document.getElementById('welcomeSection').style.display = 'none';
+      document.getElementById('phase2Screen').style.display = 'none';
+      document.getElementById('phase3Letter').style.display = 'none';
+      document.getElementById('phase4Shopping').style.display = 'none';
+      if (phase === 2) document.getElementById('phase2Screen').style.display = 'flex';
+      if (phase === 3) document.getElementById('phase3Letter').style.display = 'flex';
+      if (phase === 4) document.getElementById('phase4Shopping').style.display = 'flex';
+    }
+
     async function fetchInitialPhase() {
       const { data } = await supabase.from('phases').select('current').eq('id', 1).single();
       if (data) showPhase(data.current);
     }
+
     async function listenForPhaseChanges() {
-      supabase.channel('public:phases').on(
-        'postgres_changes',
-        { event: 'UPDATE', schema: 'public', table: 'phases' },
-        payload => {
+      supabase.channel('public:phases')
+        .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'phases' }, payload => {
           const newPhase = payload.new.current;
           showPhase(newPhase);
-        }
-      ).subscribe();
+        }).subscribe();
     }
-    fetchInitialPhase();
-    listenForPhaseChanges();
+
+    function openWheel() {
+      const now = Date.now();
+      const hour = 1000 * 60 * 60;
+      if (lastSpinTime && now - lastSpinTime < hour) {
+        let mins = Math.floor((hour - (now - lastSpinTime)) / 60000);
+        document.getElementById('timerText').innerText = `You can spin again in ${mins} min`;
+        document.getElementById('wheelModal').style.display = 'flex';
+        return;
+      }
+      document.getElementById('timerText').innerText = '';
+      document.getElementById('wheelModal').style.display = 'flex';
+    }
+
+    function spinWheel() {
+      const prizes = ['Letter A', 'Letter B', 'Letter C', 'Bonus Surprise'];
+      const result = prizes[Math.floor(Math.random() * prizes.length)];
+      const resultBox = document.getElementById('wheelResult');
+      resultBox.innerText = result;
+      resultBox.style.display = 'block';
+      lastSpinTime = Date.now();
+      setTimeout(() => {
+        resultBox.style.display = 'none';
+      }, 10000);
+    }
+
+    function closeWheel() {
+      document.getElementById('wheelModal').style.display = 'none';
+    }
   </script>
 </body>
 </html>
