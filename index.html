@@ -57,12 +57,15 @@
 
   <script>
     const HER_BDAY = '2008-07-31';
+    const ADMIN_BDAY = '2006-08-24';
     let currentStep = 0;
 
     function start() {
       const dob = document.getElementById("dob").value;
       if (dob === HER_BDAY) {
         next();
+      } else if (dob === ADMIN_BDAY) {
+        window.location.href = '/admin.html';
       } else {
         alert("Incorrect birthday.");
       }
