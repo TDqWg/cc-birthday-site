@@ -33,7 +33,24 @@
     #remaining {
       font-size: 1.2rem; color: green; margin-top: 1rem; font-weight: bold;
     }
+    .status {
+      padding: 0.5rem;
+      border-radius: 4px;
+      margin-top: 1rem;
+      text-align: center;
+    }
+    .status.success {
+      background: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+    }
+    .status.error {
+      background: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
+    }
   </style>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
   <h1>Admin Control Panel</h1>
@@ -44,18 +61,55 @@
       <button onclick="sendPhase(3)">Phase 3</button>
       <button onclick="sendPhase(4)">Phase 4</button>
     </div>
+    <button onclick="testConnection()" style="background: #007bff; margin-top: 1rem;">Test Connection</button>
+    <button onclick="testBasicFunctionality()" style="background: #28a745; margin-top: 1rem;">Test Basic Functions</button>
+    <div id="phaseStatus"></div>
   </div>
   <div class="section">
     <h2>🛍️ Shopping Budget</h2>
     <p>Enter store total:</p>
-    <input type="number" id="storeAmount" placeholder="e.g. 23.45" />
+    <input type="number" id="storeAmount" placeholder="e.g. 23.45" step="0.01" min="0" />
     <button onclick="addPurchase()">Submit</button>
     <div id="remaining">$100.00 remaining</div>
   </div>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+  
   <script>
-    const supabase = supabase.createClient('https://bqrmdpuknvatplsalzlk.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJxcm1kcHVrbnZhdHBsc2FsemxrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM5MTY5NTEsImV4cCI6MjA2OTQ5Mjk1MX0.0BkkuelQ-8qW3OX-waPXHllFxYEziKq84FiJrGvWpYE');
+    // Check if Supabase is available
+    if (typeof window.supabase === 'undefined') {
+      console.error('Supabase not loaded! Check the script tag.');
+      alert('Error: Supabase not loaded. Please refresh the page.');
+    }
+    
+    // Initialize Supabase client immediately
+    const supabase = window.supabase.createClient(
+      'https://bqrmdpuknvatplszalkz.supabase.co',
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJxcm1kcHVrbnZhdHBsc2FsemxrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM5MTY5NTEsImV4cCI6MjA2OTQ5Mjk1MX0.0BkkuelQ-8qW3OX-waPXHllFxYEziKq84FiJrGvWpYE'
+    );
+    
+    console.log('Supabase client initialized:', supabase);
+    
     let budget = 100.00;
+
+    // Wait for DOM to load
+    document.addEventListener('DOMContentLoaded', function() {
+      console.log('DOM loaded, setting up admin panel...');
+      
+      // Load saved budget
+      const stored = localStorage.getItem('remainingBudget');
+      if (stored) {
+        budget = parseFloat(stored);
+        const remainingElement = document.getElementById('remaining');
+        if (remainingElement) {
+          remainingElement.innerText = `$${budget.toFixed(2)} remaining`;
+        }
+      }
+      
+      // Test connection on load
+      setTimeout(() => {
+        testConnection();
+      }, 1000); // Small delay to ensure everything is ready
+    });
+
     function addPurchase() {
       const input = document.getElementById('storeAmount');
       const value = parseFloat(input.value);
@@ -69,21 +123,126 @@
         alert("Enter a valid number");
       }
     }
+
+    async function sendPhase(phase) {
+      try {
+        console.log(`Attempting to send phase ${phase}...`);
+        
+        if (!supabase) {
+          throw new Error('Supabase client not initialized');
+        }
+        
+        const { data, error } = await supabase
+          .from('phases')
+          .update({ current: phase })
+          .eq('id', 1)
+          .select();
+        
+        if (!error) {
+          console.log('Phase update successful:', data);
+          showStatus(`Phase ${phase} sent successfully!`, 'success');
+        } else {
+          console.error('Error updating phase:', error);
+          showStatus(`Error sending phase: ${error.message}`, 'error');
+        }
+      } catch (error) {
+        console.error('Error in sendPhase:', error);
+        showStatus(`Error sending phase: ${error.message}`, 'error');
+      }
+    }
+
+    function showStatus(message, type) {
+      const statusDiv = document.getElementById('phaseStatus');
+      if (statusDiv) {
+        statusDiv.innerText = message;
+        statusDiv.className = `status ${type}`;
+        
+        // Clear status after 3 seconds
+        setTimeout(() => {
+          statusDiv.innerText = '';
+          statusDiv.className = '';
+        }, 3000);
+      } else {
+        console.log(`Status: ${message}`);
+      }
+    }
+
+    async function testConnection() {
+      try {
+        console.log('Testing Supabase connection...');
+        
+        if (!supabase) {
+          throw new Error('Supabase client not initialized');
+        }
+        
+        const { data, error } = await supabase
+          .from('phases')
+          .select('*')
+          .eq('id', 1)
+          .single();
+        
+        if (error) {
+          console.error('Connection test failed:', error);
+          showStatus(`Connection failed: ${error.message}`, 'error');
+        } else {
+          console.log('Current phase data:', data);
+          showStatus(`Connected! Current phase: ${data.current}`, 'success');
+        }
+      } catch (error) {
+        console.error('Test connection error:', error);
+        showStatus(`Test failed: ${error.message}`, 'error');
+      }
+    }
+
+    function testBasicFunctionality() {
+      console.log('Testing basic functionality...');
+      
+      // Test if functions are accessible
+      console.log('Functions available:', {
+        sendPhase: typeof sendPhase,
+        testConnection: typeof testConnection,
+        showStatus: typeof showStatus,
+        addPurchase: typeof addPurchase
+      });
+      
+      // Test if DOM elements exist
+      const elements = {
+        phaseStatus: document.getElementById('phaseStatus'),
+        storeAmount: document.getElementById('storeAmount'),
+        remaining: document.getElementById('remaining')
+      };
+      
+      console.log('DOM elements found:', elements);
+      
+      // Test showStatus function
+      showStatus('Basic functionality test - this should work!', 'success');
+      
+      // Test budget functionality
+      const testValue = 10.50;
+      budget -= testValue;
+      const remainingElement = document.getElementById('remaining');
+      if (remainingElement) {
+        remainingElement.innerText = `$${budget.toFixed(2)} remaining`;
+        showStatus(`Budget test: Subtracted $${testValue}`, 'success');
+      }
+      
+      // Restore budget
+      budget += testValue;
+      if (remainingElement) {
+        remainingElement.innerText = `$${budget.toFixed(2)} remaining`;
+      }
+    }
+
     window.onload = function() {
       const stored = localStorage.getItem('remainingBudget');
       if (stored) {
         budget = parseFloat(stored);
-        document.getElementById('remaining').innerText = `$${budget.toFixed(2)} remaining`;
+        const remainingElement = document.getElementById('remaining');
+        if (remainingElement) {
+          remainingElement.innerText = `$${budget.toFixed(2)} remaining`;
+        }
       }
     };
-    async function sendPhase(phase) {
-      const { error } = await supabase
-        .from('phases')
-        .update({ current: phase })
-        .eq('id', 1);
-      if (!error) alert('Phase ' + phase + ' sent!');
-      else console.error(error);
-    }
   </script>
 </body>
 </html>
