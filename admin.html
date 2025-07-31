@@ -1,13 +1,219 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+  <meta charset="UTF-8">
   <title>Admin Budget Control</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Dancing+Script:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
-    body { font-family: sans-serif; text-align: center; margin-top: 10vh; }
-    input { font-size: 1.2rem; padding: 0.5rem; width: 100px; }
-    button { font-size: 1rem; padding: 0.5rem 1rem; margin-left: 10px; }
-    #balance { font-size: 2rem; color: green; margin-top: 2rem; }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      color: #333;
+      overflow-x: hidden;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 2rem;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .card {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(20px);
+      border-radius: 24px;
+      padding: 3rem;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      width: 100%;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, #28a745, #20c997, #17a2b8);
+      background-size: 400% 400%;
+      animation: gradientShift 3s ease infinite;
+    }
+
+    @keyframes gradientShift {
+      0%, 100% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+    }
+
+    h1, h2 {
+      font-family: 'Dancing Script', cursive;
+      color: #2c3e50;
+      margin-bottom: 1.5rem;
+      font-weight: 600;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      background: linear-gradient(45deg, #28a745, #20c997);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    h2 {
+      font-size: 2rem;
+      color: #34495e;
+    }
+
+    p {
+      font-size: 1.1rem;
+      line-height: 1.6;
+      color: #555;
+      margin-bottom: 1rem;
+    }
+
+    .input-group {
+      margin: 2rem 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    input[type="number"] {
+      width: 100%;
+      max-width: 300px;
+      padding: 1rem 1.5rem;
+      border: 2px solid #e1e8ed;
+      border-radius: 12px;
+      font-size: 1.1rem;
+      font-family: 'Inter', sans-serif;
+      background: white;
+      transition: all 0.3s ease;
+      text-align: center;
+    }
+
+    input[type="number"]:focus {
+      outline: none;
+      border-color: #28a745;
+      box-shadow: 0 0 0 3px rgba(40, 167, 69, 0.1);
+    }
+
+    .btn {
+      background: linear-gradient(45deg, #28a745, #20c997);
+      color: white;
+      border: none;
+      padding: 1rem 2rem;
+      border-radius: 12px;
+      font-size: 1.1rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+      font-family: 'Inter', sans-serif;
+      margin-top: 1rem;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(40, 167, 69, 0.4);
+    }
+
+    .btn:active {
+      transform: translateY(0);
+    }
+
+    #balance {
+      font-size: 2.5rem;
+      font-weight: 600;
+      color: #28a745;
+      margin: 2rem 0;
+      padding: 1.5rem;
+      background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+      border-radius: 16px;
+      border: 2px solid #c3e6cb;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0% {
+        box-shadow: 0 0 0 0 rgba(40, 167, 69, 0.7);
+      }
+      70% {
+        box-shadow: 0 0 0 10px rgba(40, 167, 69, 0);
+      }
+      100% {
+        box-shadow: 0 0 0 0 rgba(40, 167, 69, 0);
+      }
+    }
+
+    .status-indicator {
+      display: inline-block;
+      width: 12px;
+      height: 12px;
+      background: #28a745;
+      border-radius: 50%;
+      margin-right: 8px;
+      animation: blink 2s infinite;
+    }
+
+    @keyframes blink {
+      0%, 50% { opacity: 1; }
+      51%, 100% { opacity: 0.3; }
+    }
+
+    .admin-info {
+      background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+      border-radius: 16px;
+      padding: 1.5rem;
+      margin: 2rem 0;
+      border: 2px solid #90caf9;
+    }
+
+    .admin-info p {
+      color: #1565c0;
+      font-weight: 500;
+      margin-bottom: 0.5rem;
+    }
+
+    .emoji {
+      font-size: 1.5rem;
+      margin: 0 0.2rem;
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        padding: 1rem;
+      }
+      
+      .card {
+        padding: 2rem;
+        border-radius: 16px;
+      }
+      
+      h1 {
+        font-size: 2rem;
+      }
+      
+      h2 {
+        font-size: 1.5rem;
+      }
+    }
   </style>
   
 <!-- Firebase SDK -->
@@ -21,10 +227,27 @@
 
 </head>
 <body>
-  <h2>Enter Store Total</h2>
-  <input type="number" id="storeAmount" placeholder="e.g. 27.50" />
-  <button onclick="submitAmount()">Submit</button>
-  <div id="balance">$100.00 remaining</div>
+  <div class="container">
+    <div class="card">
+      <h1>🎛️ Admin Control Panel</h1>
+      <p>Manage CC's shopping budget in real-time</p>
+      
+      <div class="admin-info">
+        <p><span class="status-indicator"></span>Connected to Firebase</p>
+        <p>Updates will appear instantly on CC's device</p>
+      </div>
+
+      <div class="input-group">
+        <h2>Enter Store Total</h2>
+        <input type="number" id="storeAmount" placeholder="e.g. 27.50" step="0.01" min="0" />
+        <button class="btn" onclick="submitAmount()">Submit Purchase 💳</button>
+      </div>
+
+      <div id="balance">$100.00 remaining</div>
+
+      <p>Keep track of CC's shopping adventure! 🛍️</p>
+    </div>
+  </div>
 
   <script>
     let budget = 100;
@@ -37,10 +260,28 @@
     function submitAmount() {
       const amount = parseFloat(document.getElementById("storeAmount").value);
       if (!isNaN(amount) && amount > 0) {
-        db.ref("budget").set(Math.max(0, budget - amount));
+        const newBudget = Math.max(0, budget - amount);
+        db.ref("budget").set(newBudget);
         document.getElementById("storeAmount").value = "";
+        
+        // Show success feedback
+        const btn = document.querySelector('.btn');
+        const originalText = btn.innerText;
+        btn.innerText = 'Purchase Submitted! ✅';
+        btn.style.background = 'linear-gradient(45deg, #28a745, #20c997)';
+        
+        setTimeout(() => {
+          btn.innerText = originalText;
+        }, 2000);
+      } else {
+        alert("Please enter a valid amount.");
       }
     }
+
+    // Auto-focus on input when page loads
+    window.addEventListener('load', () => {
+      document.getElementById("storeAmount").focus();
+    });
   </script>
 </body>
 </html>
