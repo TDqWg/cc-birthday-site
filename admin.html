@@ -1,42 +1,292 @@
 
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Admin Panel</title>
   <style>
-    body { font-family: sans-serif; text-align: center; margin-top: 10vh; }
-    button { margin: 10px; padding: 10px 20px; font-size: 1rem; }
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f5f5f5;
+      margin: 0;
+      padding: 2rem;
+    }
+    h1 { text-align: center; color: #333; }
+    .section {
+      background: white;
+      padding: 2rem;
+      margin: 2rem auto;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      max-width: 500px;
+    }
+    .section h2 { margin-top: 0; color: #444; }
+    .btn-group button {
+      background-color: gold; color: white; padding: 0.75rem 1.5rem;
+      border: none; border-radius: 8px; margin: 0.5rem; cursor: pointer; font-size: 1rem;
+    }
+    input[type="number"] {
+      width: 100%; padding: 0.5rem; margin-top: 0.5rem;
+      font-size: 1rem; border: 1px solid #ccc; border-radius: 8px;
+    }
+    #remaining {
+      font-size: 1.2rem; color: green; margin-top: 1rem; font-weight: bold;
+    }
+    .status {
+      padding: 0.5rem;
+      border-radius: 4px;
+      margin-top: 1rem;
+      text-align: center;
+    }
+    .status.success {
+      background: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+    }
+    .status.error {
+      background: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
+    }
   </style>
   
-<!-- Firebase App (the core Firebase SDK) -->
-<script src="https://www.gstatic.com/firebasejs/10.5.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.5.2/firebase-database-compat.js"></script>
-<script>
-  const firebaseConfig = {
-    apiKey: "AIzaSyChS99XkN_Iy4x-MgugiJgg5SpPUo8Z-6c",
-    authDomain: "cc-birthday.firebaseapp.com",
-    databaseURL: "https://cc-birthday-default-rtdb.firebaseio.com",
-    projectId: "cc-birthday",
-    storageBucket: "cc-birthday.appspot.com",
-    messagingSenderId: "1608751312064",
-    appId: "1:1608751312064:web:ad750aae702c3a2cc69925"
-  };
-  firebase.initializeApp(firebaseConfig);
-  const db = firebase.database();
-</script>
-
+  <!-- Firebase App (the core Firebase SDK) -->
+  <script src="https://www.gstatic.com/firebasejs/10.5.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.5.2/firebase-database-compat.js"></script>
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyChS99XkN_Iy4x-MgugiJgg5SpPUo8Z-6c",
+      authDomain: "cc-birthday.firebaseapp.com",
+      databaseURL: "https://cc-birthday-default-rtdb.firebaseio.com",
+      projectId: "cc-birthday",
+      storageBucket: "cc-birthday.appspot.com",
+      messagingSenderId: "1608751312064",
+      appId: "1:1608751312064:web:ad750aae702c3a2cc69925"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+  </script>
 </head>
 <body>
-  <h2>Admin Controls</h2>
-  <button onclick="setPhase(1)">Phase 1</button>
-  <button onclick="setPhase(2)">Phase 2</button>
-  <button onclick="setPhase(3)">Phase 3</button>
-  <button onclick="setPhase(4)">Phase 4</button>
-
+  <h1>Admin Control Panel</h1>
+  <div class="section">
+    <h2>🎬 Control Phase</h2>
+    <div class="btn-group">
+      <button onclick="sendPhase(2)">Phase 2</button>
+      <button onclick="sendPhase(3)">Phase 3</button>
+      <button onclick="sendPhase(4)">Phase 4</button>
+    </div>
+    <button onclick="testConnection()" style="background: #007bff; margin-top: 1rem;">Test Firebase</button>
+    <button onclick="testBasicFunctionality()" style="background: #28a745; margin-top: 1rem;">Test Basic Functions</button>
+    <button onclick="checkNetworkStatus()" style="background: #ffc107; margin-top: 1rem;">Check Network</button>
+    <button onclick="testPhaseSync()" style="background: #6f42c1; margin-top: 1rem;">Test Phase Sync</button>
+    <div id="phaseStatus"></div>
+    <div id="networkStatus" style="margin-top: 1rem; padding: 0.5rem; background: #f8f9fa; border-radius: 4px; font-size: 0.9rem;"></div>
+  </div>
+  <div class="section">
+    <h2>🛍️ Shopping Budget</h2>
+    <p>Enter store total:</p>
+    <input type="number" id="storeAmount" placeholder="e.g. 23.45" step="0.01" min="0" />
+    <button onclick="addPurchase()">Submit</button>
+    <div id="remaining">$100.00 remaining</div>
+  </div>
+  
   <script>
-    function setPhase(p) {
-      firebase.database().ref('phase').set(p);
+    let budget = 100.00;
+
+    // Wait for DOM to load
+    document.addEventListener('DOMContentLoaded', function() {
+      console.log('DOM loaded, setting up admin panel...');
+      
+      // Load saved budget
+      const stored = localStorage.getItem('remainingBudget');
+      if (stored) {
+        budget = parseFloat(stored);
+        const remainingElement = document.getElementById('remaining');
+        if (remainingElement) {
+          remainingElement.innerText = `$${budget.toFixed(2)} remaining`;
+        }
+      }
+      
+      // Show that the admin panel is ready
+      showStatus('Admin panel ready! Phase buttons will work immediately.', 'success');
+    });
+
+    function addPurchase() {
+      const input = document.getElementById('storeAmount');
+      const value = parseFloat(input.value);
+      if (!isNaN(value) && value > 0) {
+        budget -= value;
+        budget = Math.max(0, budget);
+        document.getElementById('remaining').innerText = `$${budget.toFixed(2)} remaining`;
+        input.value = '';
+        localStorage.setItem('remainingBudget', budget);
+      } else {
+        alert("Enter a valid number");
+      }
     }
+
+    async function sendPhase(phase) {
+      try {
+        console.log(`Setting phase to ${phase}...`);
+        
+        // Update Firebase
+        await firebase.database().ref('phase').set(phase);
+        
+        console.log('Phase updated successfully:', phase);
+        showStatus(`Phase ${phase} sent successfully!`, 'success');
+        
+      } catch (error) {
+        console.error('Error in sendPhase:', error);
+        showStatus(`Error sending phase: ${error.message}`, 'error');
+      }
+    }
+
+    function showStatus(message, type) {
+      const statusDiv = document.getElementById('phaseStatus');
+      if (statusDiv) {
+        statusDiv.innerText = message;
+        statusDiv.className = `status ${type}`;
+        
+        // Clear status after 3 seconds
+        setTimeout(() => {
+          statusDiv.innerText = '';
+          statusDiv.className = '';
+        }, 3000);
+      } else {
+        console.log(`Status: ${message}`);
+      }
+    }
+
+    async function testConnection() {
+      try {
+        console.log('Testing Firebase connection...');
+        
+        const snapshot = await firebase.database().ref('phase').once('value');
+        const currentPhase = snapshot.val() || 1;
+        
+        console.log('Current phase data:', currentPhase);
+        showStatus(`Connected! Current phase: ${currentPhase}`, 'success');
+      } catch (error) {
+        console.error('Test connection error:', error);
+        showStatus(`Test failed: ${error.message}`, 'error');
+      }
+    }
+
+    function testBasicFunctionality() {
+      console.log('Testing basic functionality...');
+      
+      // Test if functions are accessible
+      console.log('Functions available:', {
+        sendPhase: typeof sendPhase,
+        testConnection: typeof testConnection,
+        showStatus: typeof showStatus,
+        addPurchase: typeof addPurchase
+      });
+      
+      // Test if DOM elements exist
+      const elements = {
+        phaseStatus: document.getElementById('phaseStatus'),
+        storeAmount: document.getElementById('storeAmount'),
+        remaining: document.getElementById('remaining')
+      };
+      
+      console.log('DOM elements found:', elements);
+      
+      // Test showStatus function
+      showStatus('Basic functionality test - this should work!', 'success');
+      
+      // Test budget functionality
+      const testValue = 10.50;
+      budget -= testValue;
+      const remainingElement = document.getElementById('remaining');
+      if (remainingElement) {
+        remainingElement.innerText = `$${budget.toFixed(2)} remaining`;
+        showStatus(`Budget test: Subtracted $${testValue}`, 'success');
+      }
+      
+      // Restore budget
+      budget += testValue;
+      if (remainingElement) {
+        remainingElement.innerText = `$${budget.toFixed(2)} remaining`;
+      }
+    }
+
+    async function checkNetworkStatus() {
+      const networkStatus = document.getElementById('networkStatus');
+      networkStatus.innerHTML = 'Checking network status...';
+      
+      try {
+        // Test basic internet connectivity
+        const response = await fetch('https://httpbin.org/get', { 
+          method: 'GET',
+          mode: 'no-cors'
+        });
+        
+        let status = '✅ Internet connection: OK<br>';
+        
+        // Test Firebase connectivity
+        try {
+          const snapshot = await firebase.database().ref('phase').once('value');
+          const currentPhase = snapshot.val() || 1;
+          status += `✅ Firebase connection: OK (Phase ${currentPhase})<br>`;
+        } catch (error) {
+          status += `❌ Firebase connection: ${error.message}<br>`;
+        }
+        
+        // Check if Firebase script loaded
+        if (typeof firebase !== 'undefined') {
+          status += '✅ Firebase library: Loaded<br>';
+        } else {
+          status += '❌ Firebase library: Not loaded<br>';
+        }
+        
+        networkStatus.innerHTML = status;
+      } catch (error) {
+        networkStatus.innerHTML = `❌ Network check failed: ${error.message}`;
+      }
+    }
+
+    async function testPhaseSync() {
+      try {
+        showStatus('Testing phase sync...', 'success');
+        
+        // Test setting a phase
+        const testPhase = 2;
+        await sendPhase(testPhase);
+        
+        // Wait a moment, then check if it was saved
+        setTimeout(async () => {
+          try {
+            const snapshot = await firebase.database().ref('phase').once('value');
+            const savedPhase = snapshot.val();
+            
+            if (savedPhase === testPhase) {
+              showStatus('✅ Phase sync test successful!', 'success');
+            } else {
+              showStatus('❌ Phase sync test failed', 'error');
+            }
+          } catch (error) {
+            showStatus('❌ Phase sync test failed', 'error');
+          }
+        }, 2000);
+        
+      } catch (error) {
+        showStatus(`Phase sync test failed: ${error.message}`, 'error');
+      }
+    }
+
+    window.onload = function() {
+      const stored = localStorage.getItem('remainingBudget');
+      if (stored) {
+        budget = parseFloat(stored);
+        const remainingElement = document.getElementById('remaining');
+        if (remainingElement) {
+          remainingElement.innerText = `$${budget.toFixed(2)} remaining`;
+        }
+      }
+    };
   </script>
 </body>
 </html>
