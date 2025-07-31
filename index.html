@@ -215,6 +215,21 @@
       color: #28a745;
       margin-top: 0.5rem;
     }
+    .phase-notification {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: gold;
+      color: white;
+      padding: 1rem 2rem;
+      border-radius: 8px;
+      font-size: 1.2rem;
+      font-weight: bold;
+      z-index: 1002;
+      display: none;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    }
   </style>
 </head>
 <body>
@@ -225,6 +240,8 @@
   </div>
 
   <button id="spinBtn" style="display:none" onclick="openWheel()">➶</button>
+
+  <div id="phaseNotification" class="phase-notification"></div>
 
   <div id="wheelModal">
     <button id="closeWheel" onclick="closeWheel()">X</button>
@@ -345,14 +362,28 @@
       // Show the appropriate section
       if (phase === 2) {
         document.getElementById('phase2Screen').style.display = 'flex';
+        showPhaseNotification('Phase 2: You can open your shoes now! 🎉');
       } else if (phase === 3) {
         document.getElementById('phase3Letter').style.display = 'flex';
+        showPhaseNotification('Phase 3: Lunch time! 🍽️');
       } else if (phase === 4) {
         document.getElementById('phase4Shopping').style.display = 'flex';
+        showPhaseNotification('Phase 4: Shopping time! 🛍️');
       } else {
         // Default to welcome section
         document.getElementById('welcomeSection').style.display = 'flex';
       }
+    }
+
+    function showPhaseNotification(message) {
+      const notification = document.getElementById('phaseNotification');
+      notification.innerText = message;
+      notification.style.display = 'block';
+      
+      // Hide notification after 3 seconds
+      setTimeout(() => {
+        notification.style.display = 'none';
+      }, 3000);
     }
 
     async function fetchInitialPhase() {
@@ -378,17 +409,25 @@
 
     async function listenForPhaseChanges() {
       try {
-        supabase.channel('public:phases')
+        // Create a more specific channel for phase changes
+        const channel = supabase.channel('phase-changes')
           .on('postgres_changes', { 
             event: 'UPDATE', 
             schema: 'public', 
-            table: 'phases' 
+            table: 'phases',
+            filter: 'id=eq.1' // Only listen to the specific row we care about
           }, payload => {
             console.log('Phase change detected:', payload);
             const newPhase = payload.new.current;
+            console.log('Switching to phase:', newPhase);
             showPhase(newPhase);
           })
-          .subscribe();
+          .subscribe((status) => {
+            console.log('Subscription status:', status);
+            if (status === 'SUBSCRIBED') {
+              console.log('Successfully subscribed to phase changes');
+            }
+          });
       } catch (error) {
         console.error('Error setting up phase listener:', error);
       }
