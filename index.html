@@ -5,7 +5,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>CC's Birthday Guide</title>
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎂</text></svg>">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>��</text></svg>">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     body {
       margin: 0;
@@ -182,12 +183,41 @@
       text-shadow: 0 1px 1px #fff;
     }
     .scrollText div { max-width: 100%; }
+    .budget-tracker {
+      background: white;
+      padding: 1rem;
+      border-radius: 8px;
+      margin-top: 1rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    .budget-input {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 0.5rem;
+    }
+    .budget-input input {
+      flex: 1;
+      padding: 0.5rem;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+    .budget-input button {
+      padding: 0.5rem 1rem;
+      background: gold;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .budget-remaining {
+      font-size: 1.2rem;
+      font-weight: bold;
+      color: #28a745;
+      margin-top: 0.5rem;
+    }
   </style>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
 </head>
 <body>
-<!-- body omitted for space, will continue in next cell -->
-
   <div class="centered login">
     <h1>Enter Your Birthday</h1>
     <input type="date" id="dob" />
@@ -209,7 +239,7 @@
     <div class="letterContent" id="letterText">
       <p>Dear CC,</p>
       <p>This is your special day, and there are so many surprises waiting for you! 💛</p>
-      <p>Scroll down to see what’s next...</p>
+      <p>Scroll down to see what's next...</p>
       <div id="videoPlaceholder">[ Video Placeholder ]</div>
       <button style="margin-top:2rem" onclick="goToWelcome()">Next</button>
     </div>
@@ -223,7 +253,7 @@
         • Check the top-right corner to spin the surprise wheel every hour<br>
         • Each section may include a video, a note, or something extra magical<br>
         • The journey is paced for fun, so take your time and enjoy 💖<br>
-        • Don’t forget to smile. Today’s all about you 💫<br>
+        • Don't forget to smile. Today's all about you 💫<br>
       </div>
     </div>
   </section>
@@ -235,27 +265,51 @@
   <section id="phase3Letter" class="centered hidden">
     <div class="letterContent">
       <p>Dear CC,</p>
-      <p>I hope you’re enjoying the journey so far! Your next surprise is a delicious one — it’s time for lunch 🥪🍓</p>
-      <p>You’ve earned it. Love you 💛</p>
+      <p>I hope you're enjoying the journey so far! Your next surprise is a delicious one — it's time for lunch 🥪🍓</p>
+      <p>You've earned it. Love you 💛</p>
     </div>
   </section>
 
   <section id="phase4Shopping" class="centered hidden">
     <div class="letterContent">
       <p>Dear CC,</p>
-      <p>It’s shopping time! 🎁🛍️ You have $100 to spend on whatever makes you smile. Let’s make this spree unforgettable!</p>
+      <p>It's shopping time! 🎁🛍️ You have $100 to spend on whatever makes you smile. Let's make this spree unforgettable!</p>
+      <div class="budget-tracker">
+        <h3>Budget Tracker</h3>
+        <div class="budget-input">
+          <input type="number" id="purchaseAmount" placeholder="Enter purchase amount" step="0.01" min="0" />
+          <button onclick="addPurchase()">Add Purchase</button>
+        </div>
+        <div class="budget-remaining" id="budgetRemaining">$100.00 remaining</div>
+      </div>
     </div>
   </section>
 
   <script>
-    const supabase = supabase.createClient(
-      'https://bqrmdpuknvatplszalkz.supabase.co',
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJxcm1kcHVrbnZhdHBsc2FsemxrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM5MTY5NTEsImV4cCI6MjA2OTQ5Mjk1MX0.0BkkuelQ-8qW3OX-waPXHllFxYEziKq84FiJrGvWpYE'
-    );
-
+    // Constants defined at the top
     const HER_BDAY = '2008-07-31';
     const YOUR_BDAY = '2006-08-24';
+    
+    // Initialize Supabase client after script loads
+    let supabase;
     let lastSpinTime = null;
+    let currentBudget = 100.00;
+
+    // Wait for DOM and Supabase to load
+    document.addEventListener('DOMContentLoaded', function() {
+      // Initialize Supabase client
+      supabase = window.supabase.createClient(
+        'https://bqrmdpuknvatplszalkz.supabase.co',
+        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJxcm1kcHVrbnZhdHBsc2FsemxrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM5MTY5NTEsImV4cCI6MjA2OTQ5Mjk1MX0.0BkkuelQ-8qW3OX-waPXHllFxYEziKq84FiJrGvWpYE'
+      );
+      
+      // Load saved budget
+      const savedBudget = localStorage.getItem('remainingBudget');
+      if (savedBudget) {
+        currentBudget = parseFloat(savedBudget);
+        updateBudgetDisplay();
+      }
+    });
 
     function checkBirthday() {
       const dob = document.getElementById('dob').value;
@@ -282,37 +336,77 @@
     }
 
     function showPhase(phase) {
+      // Hide all sections first
       document.getElementById('welcomeSection').style.display = 'none';
       document.getElementById('phase2Screen').style.display = 'none';
       document.getElementById('phase3Letter').style.display = 'none';
       document.getElementById('phase4Shopping').style.display = 'none';
-      if (phase === 2) document.getElementById('phase2Screen').style.display = 'flex';
-      if (phase === 3) document.getElementById('phase3Letter').style.display = 'flex';
-      if (phase === 4) document.getElementById('phase4Shopping').style.display = 'flex';
+      
+      // Show the appropriate section
+      if (phase === 2) {
+        document.getElementById('phase2Screen').style.display = 'flex';
+      } else if (phase === 3) {
+        document.getElementById('phase3Letter').style.display = 'flex';
+      } else if (phase === 4) {
+        document.getElementById('phase4Shopping').style.display = 'flex';
+      } else {
+        // Default to welcome section
+        document.getElementById('welcomeSection').style.display = 'flex';
+      }
     }
 
     async function fetchInitialPhase() {
-      const { data } = await supabase.from('phases').select('current').eq('id', 1).single();
-      if (data) showPhase(data.current);
+      try {
+        const { data, error } = await supabase
+          .from('phases')
+          .select('current')
+          .eq('id', 1)
+          .single();
+        
+        if (error) {
+          console.error('Error fetching phase:', error);
+          return;
+        }
+        
+        if (data) {
+          showPhase(data.current);
+        }
+      } catch (error) {
+        console.error('Error in fetchInitialPhase:', error);
+      }
     }
 
     async function listenForPhaseChanges() {
-      supabase.channel('public:phases')
-        .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'phases' }, payload => {
-          const newPhase = payload.new.current;
-          showPhase(newPhase);
-        }).subscribe();
+      try {
+        supabase.channel('public:phases')
+          .on('postgres_changes', { 
+            event: 'UPDATE', 
+            schema: 'public', 
+            table: 'phases' 
+          }, payload => {
+            console.log('Phase change detected:', payload);
+            const newPhase = payload.new.current;
+            showPhase(newPhase);
+          })
+          .subscribe();
+      } catch (error) {
+        console.error('Error setting up phase listener:', error);
+      }
     }
 
     function openWheel() {
       const now = Date.now();
-      const hour = 1000 * 60 * 60;
-      if (lastSpinTime && now - lastSpinTime < hour) {
-        let mins = Math.floor((hour - (now - lastSpinTime)) / 60000);
-        document.getElementById('timerText').innerText = `You can spin again in ${mins} min`;
+      const hour = 1000 * 60 * 60; // 1 hour in milliseconds
+      
+      // Check if we can spin (respect 1-hour rule even if late)
+      if (lastSpinTime && (now - lastSpinTime) < hour) {
+        const remainingTime = hour - (now - lastSpinTime);
+        const remainingMinutes = Math.ceil(remainingTime / (1000 * 60));
+        document.getElementById('timerText').innerText = `You can spin again in ${remainingMinutes} minutes`;
         document.getElementById('wheelModal').style.display = 'flex';
         return;
       }
+      
       document.getElementById('timerText').innerText = '';
       document.getElementById('wheelModal').style.display = 'flex';
     }
@@ -324,6 +418,10 @@
       resultBox.innerText = result;
       resultBox.style.display = 'block';
       lastSpinTime = Date.now();
+      
+      // Save spin time to localStorage
+      localStorage.setItem('lastSpinTime', lastSpinTime);
+      
       setTimeout(() => {
         resultBox.style.display = 'none';
       }, 10000);
@@ -332,6 +430,39 @@
     function closeWheel() {
       document.getElementById('wheelModal').style.display = 'none';
     }
+
+    function addPurchase() {
+      const input = document.getElementById('purchaseAmount');
+      const value = parseFloat(input.value);
+      
+      if (!isNaN(value) && value > 0) {
+        currentBudget -= value;
+        currentBudget = Math.max(0, currentBudget);
+        
+        // Save to localStorage
+        localStorage.setItem('remainingBudget', currentBudget);
+        
+        updateBudgetDisplay();
+        input.value = '';
+      } else {
+        alert("Please enter a valid amount");
+      }
+    }
+
+    function updateBudgetDisplay() {
+      const budgetElement = document.getElementById('budgetRemaining');
+      if (budgetElement) {
+        budgetElement.innerText = `$${currentBudget.toFixed(2)} remaining`;
+      }
+    }
+
+    // Load saved spin time on page load
+    window.addEventListener('load', function() {
+      const savedSpinTime = localStorage.getItem('lastSpinTime');
+      if (savedSpinTime) {
+        lastSpinTime = parseInt(savedSpinTime);
+      }
+    });
   </script>
 </body>
 </html>
