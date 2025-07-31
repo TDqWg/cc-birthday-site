@@ -8,23 +8,6 @@
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎂</text></svg>">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
   
-  <!-- Firebase App (the core Firebase SDK) -->
-  <script src="https://www.gstatic.com/firebasejs/10.5.2/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.5.2/firebase-database-compat.js"></script>
-  <script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyChS99XkN_Iy4x-MgugiJgg5SpPUo8Z-6c",
-      authDomain: "cc-birthday.firebaseapp.com",
-      databaseURL: "https://cc-birthday-default-rtdb.firebaseio.com",
-      projectId: "cc-birthday",
-      storageBucket: "cc-birthday.appspot.com",
-      messagingSenderId: "1608751312064",
-      appId: "1:1608751312064:web:ad750aae702c3a2cc69925"
-    };
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.database();
-  </script>
-
   <style>
     * {
       margin: 0;
@@ -34,7 +17,7 @@
 
     body {
       font-family: 'Inter', sans-serif;
-      background: #fdf2f8;
+      background: linear-gradient(135deg, #fdf2f8 0%, #fce7f3 50%, #fef3c7 100%);
       color: #1f2937;
       overflow-x: hidden;
       min-height: 100vh;
@@ -50,9 +33,10 @@
       width: 100%;
       height: 100%;
       background-image: 
-        radial-gradient(circle at 20% 30%, rgba(255, 215, 0, 0.1) 0%, transparent 50%),
-        radial-gradient(circle at 80% 70%, rgba(255, 215, 0, 0.08) 0%, transparent 50%),
-        radial-gradient(circle at 40% 80%, rgba(255, 215, 0, 0.06) 0%, transparent 50%);
+        radial-gradient(circle at 20% 30%, rgba(255, 182, 193, 0.3) 0%, transparent 50%),
+        radial-gradient(circle at 80% 70%, rgba(255, 105, 180, 0.2) 0%, transparent 50%),
+        radial-gradient(circle at 40% 80%, rgba(255, 20, 147, 0.15) 0%, transparent 50%),
+        radial-gradient(circle at 60% 20%, rgba(255, 215, 0, 0.1) 0%, transparent 50%);
       pointer-events: none;
       z-index: -1;
     }
@@ -68,15 +52,15 @@
     }
 
     .content-card {
-      background: linear-gradient(135deg, #e9d5ff 0%, #fdf2f8 50%, #fef3c7 100%);
+      background: linear-gradient(135deg, #fdf2f8 0%, #fce7f3 30%, #fef3c7 70%, #fdf2f8 100%);
       border-radius: 24px;
       padding: 3rem;
       max-width: 900px;
       width: 100%;
       position: relative;
       box-shadow: 
-        0 20px 40px rgba(0, 0, 0, 0.1),
-        0 0 0 1px rgba(255, 215, 0, 0.1);
+        0 20px 40px rgba(255, 182, 193, 0.3),
+        0 0 0 1px rgba(255, 182, 193, 0.2);
       overflow: hidden;
     }
 
@@ -87,65 +71,13 @@
       left: -50%;
       width: 200%;
       height: 200%;
-      background: radial-gradient(circle, rgba(255, 215, 0, 0.05) 0%, transparent 70%);
-      animation: float 6s ease-in-out infinite;
+      background: radial-gradient(circle, rgba(255, 182, 193, 0.1) 0%, transparent 70%);
+      animation: float 8s ease-in-out infinite;
     }
 
     @keyframes float {
       0%, 100% { transform: translateY(0px) rotate(0deg); }
       50% { transform: translateY(-20px) rotate(180deg); }
-    }
-
-    /* Navigation */
-    .nav {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 3rem;
-      position: relative;
-      z-index: 2;
-    }
-
-    .logo {
-      font-weight: 700;
-      font-size: 1.5rem;
-      color: #1f2937;
-      background: linear-gradient(135deg, #fbbf24, #f59e0b);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-
-    .nav-links {
-      display: flex;
-      gap: 2rem;
-      list-style: none;
-    }
-
-    .nav-links a {
-      color: #6b7280;
-      text-decoration: none;
-      font-weight: 500;
-      transition: color 0.3s ease;
-    }
-
-    .nav-links a:hover {
-      color: #f59e0b;
-    }
-
-    .sign-in-btn {
-      background: linear-gradient(135deg, #fbbf24, #f59e0b);
-      color: white;
-      border: none;
-      padding: 0.75rem 1.5rem;
-      border-radius: 12px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: transform 0.3s ease;
-    }
-
-    .sign-in-btn:hover {
-      transform: translateY(-2px);
     }
 
     /* Main content layout */
@@ -156,50 +88,29 @@
       align-items: center;
       position: relative;
       z-index: 2;
+      min-height: 400px;
     }
 
-    /* Left section - Birthday greeting */
-    .birthday-section {
-      text-align: left;
-    }
-
-    .birthday-title {
-      font-size: 3.5rem;
-      font-weight: 700;
-      line-height: 1.1;
-      margin-bottom: 1rem;
-      background: linear-gradient(135deg, #1f2937, #f59e0b);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-
-    .birthday-title .highlight {
-      font-size: 4.5rem;
-      background: linear-gradient(135deg, #fbbf24, #f59e0b);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-
-    .birthday-subtitle {
-      font-size: 1.1rem;
-      color: #6b7280;
-      font-weight: 400;
-      margin-bottom: 2rem;
+    /* Left section - Decorative elements */
+    .left-section {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
     }
 
     /* 3D Podium */
     .podium {
       width: 120px;
       height: 80px;
-      background: linear-gradient(135deg, #ffffff, #f3f4f6);
+      background: linear-gradient(135deg, #ffffff, #fdf2f8);
       border-radius: 12px;
       position: relative;
       margin: 2rem 0;
       box-shadow: 
-        0 8px 16px rgba(0, 0, 0, 0.1),
-        0 0 0 1px rgba(255, 215, 0, 0.2);
+        0 8px 16px rgba(255, 182, 193, 0.3),
+        0 0 0 1px rgba(255, 182, 193, 0.2);
       transform: perspective(1000px) rotateX(15deg);
     }
 
@@ -210,107 +121,35 @@
       left: 10px;
       right: 10px;
       height: 10px;
-      background: linear-gradient(135deg, #fbbf24, #f59e0b);
+      background: linear-gradient(135deg, #ffb6c1, #ff69b4);
       border-radius: 0 0 8px 8px;
     }
 
-    /* Right section - Birthday entry */
-    .entry-section {
-      background: rgba(255, 255, 255, 0.8);
+    /* Right section - Decorative elements */
+    .right-section {
+      background: rgba(255, 255, 255, 0.6);
       padding: 2.5rem;
       border-radius: 20px;
       backdrop-filter: blur(10px);
-      border: 1px solid rgba(255, 215, 0, 0.2);
+      border: 1px solid rgba(255, 182, 193, 0.3);
       position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 300px;
     }
 
-    .entry-section::before {
+    .right-section::before {
       content: '';
       position: absolute;
       top: -2px;
       left: -2px;
       right: -2px;
       bottom: -2px;
-      background: linear-gradient(135deg, #fbbf24, #f59e0b);
+      background: linear-gradient(135deg, #ffb6c1, #ff69b4);
       border-radius: 20px;
       z-index: -1;
       opacity: 0.3;
-    }
-
-    .entry-title {
-      font-size: 2rem;
-      font-weight: 700;
-      color: #1f2937;
-      margin-bottom: 1rem;
-      text-align: center;
-    }
-
-    .entry-subtitle {
-      color: #6b7280;
-      text-align: center;
-      margin-bottom: 2rem;
-      font-size: 1rem;
-    }
-
-    .birthday-form {
-      display: flex;
-      flex-direction: column;
-      gap: 1.5rem;
-    }
-
-    .form-group {
-      position: relative;
-    }
-
-    .form-input {
-      width: 100%;
-      padding: 1rem 1.5rem;
-      border: 2px solid #e5e7eb;
-      border-radius: 12px;
-      font-size: 1rem;
-      font-family: 'Inter', sans-serif;
-      background: white;
-      transition: all 0.3s ease;
-    }
-
-    .form-input:focus {
-      outline: none;
-      border-color: #f59e0b;
-      box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.1);
-    }
-
-    .submit-btn {
-      background: linear-gradient(135deg, #fbbf24, #f59e0b);
-      color: white;
-      border: none;
-      padding: 1rem 2rem;
-      border-radius: 12px;
-      font-size: 1.1rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .submit-btn::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: -100%;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-      transition: left 0.5s;
-    }
-
-    .submit-btn:hover::before {
-      left: 100%;
-    }
-
-    .submit-btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 20px rgba(245, 158, 11, 0.3);
     }
 
     /* 3D Balloons */
@@ -318,11 +157,11 @@
       position: absolute;
       width: 60px;
       height: 80px;
-      background: linear-gradient(135deg, #fbbf24, #f59e0b);
+      background: linear-gradient(135deg, #ffb6c1, #ff69b4);
       border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
       box-shadow: 
-        0 8px 16px rgba(0, 0, 0, 0.2),
-        inset 0 -4px 8px rgba(0, 0, 0, 0.1);
+        0 8px 16px rgba(255, 182, 193, 0.4),
+        inset 0 -4px 8px rgba(255, 105, 180, 0.2);
       animation: balloonFloat 4s ease-in-out infinite;
     }
 
@@ -334,7 +173,7 @@
       transform: translateX(-50%);
       width: 2px;
       height: 30px;
-      background: linear-gradient(to bottom, #fbbf24, #f59e0b);
+      background: linear-gradient(to bottom, #ffb6c1, #ff69b4);
     }
 
     .balloon:nth-child(1) {
@@ -370,10 +209,10 @@
     .sphere {
       position: absolute;
       border-radius: 50%;
-      background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.8), rgba(255, 215, 0, 0.6));
+      background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.9), rgba(255, 182, 193, 0.7));
       box-shadow: 
-        0 4px 8px rgba(0, 0, 0, 0.1),
-        inset 0 -2px 4px rgba(0, 0, 0, 0.1);
+        0 4px 8px rgba(255, 182, 193, 0.3),
+        inset 0 -2px 4px rgba(255, 105, 180, 0.2);
       animation: sphereFloat 5s ease-in-out infinite;
     }
 
@@ -406,6 +245,83 @@
       50% { transform: translateY(-10px) scale(1.05); }
     }
 
+    /* Floating Hearts */
+    .heart {
+      position: absolute;
+      font-size: 1.5rem;
+      color: #ff69b4;
+      animation: heartFloat 6s ease-in-out infinite;
+      opacity: 0.8;
+    }
+
+    .heart:nth-child(8) {
+      top: 15%;
+      left: 20%;
+      animation-delay: 0s;
+    }
+
+    .heart:nth-child(9) {
+      top: 25%;
+      right: 25%;
+      animation-delay: 2s;
+    }
+
+    .heart:nth-child(10) {
+      bottom: 25%;
+      left: 30%;
+      animation-delay: 4s;
+    }
+
+    .heart:nth-child(11) {
+      bottom: 15%;
+      right: 20%;
+      animation-delay: 1s;
+    }
+
+    @keyframes heartFloat {
+      0%, 100% { transform: translateY(0px) scale(1); }
+      50% { transform: translateY(-20px) scale(1.1); }
+    }
+
+    /* Sparkles */
+    .sparkle {
+      position: absolute;
+      width: 4px;
+      height: 4px;
+      background: #ffd700;
+      border-radius: 50%;
+      animation: sparkle 3s ease-in-out infinite;
+    }
+
+    .sparkle:nth-child(12) {
+      top: 40%;
+      left: 15%;
+      animation-delay: 0s;
+    }
+
+    .sparkle:nth-child(13) {
+      top: 50%;
+      right: 20%;
+      animation-delay: 1s;
+    }
+
+    .sparkle:nth-child(14) {
+      bottom: 40%;
+      left: 25%;
+      animation-delay: 2s;
+    }
+
+    .sparkle:nth-child(15) {
+      bottom: 50%;
+      right: 15%;
+      animation-delay: 0.5s;
+    }
+
+    @keyframes sparkle {
+      0%, 100% { opacity: 0; transform: scale(0); }
+      50% { opacity: 1; transform: scale(1); }
+    }
+
     /* Social media icons */
     .social-icons {
       position: absolute;
@@ -423,14 +339,15 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      color: #6b7280;
+      color: #ff69b4;
       text-decoration: none;
       transition: all 0.3s ease;
       backdrop-filter: blur(10px);
+      font-size: 1.2rem;
     }
 
     .social-icon:hover {
-      background: linear-gradient(135deg, #fbbf24, #f59e0b);
+      background: linear-gradient(135deg, #ffb6c1, #ff69b4);
       color: white;
       transform: translateY(-2px);
     }
@@ -442,235 +359,77 @@
         gap: 2rem;
       }
 
-      .birthday-title {
-        font-size: 2.5rem;
-      }
-
-      .birthday-title .highlight {
-        font-size: 3rem;
-      }
-
       .content-card {
         padding: 2rem;
         margin: 1rem;
       }
-
-      .nav {
-        flex-direction: column;
-        gap: 1rem;
-      }
-
-      .nav-links {
-        display: none;
-      }
     }
 
-    /* Hidden elements for other phases */
+    /* Hidden elements */
     .hidden {
       display: none;
     }
 
-    /* Rest of the existing styles for other sections */
+    /* Admin controls */
     #adminControls {
-      display: none;
-      position: fixed;
-      top: 10px;
-      left: 10px;
-      background: white;
-      padding: 1rem;
-      border-radius: 8px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.2);
-      z-index: 1001;
-    }
-
-    #spinBtn {
       position: fixed;
       top: 20px;
-      right: 20px;
-      background: linear-gradient(135deg, #fbbf24, #f59e0b);
-      border: none;
-      border-radius: 50%;
-      width: 60px;
-      height: 60px;
-      color: white;
-      font-size: 1.5rem;
-      cursor: pointer;
-      z-index: 999;
-      box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
-    }
-
-    #wheelModal {
-      position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0,0,0,0.6);
-      display: none;
-      justify-content: center;
-      align-items: center;
-      flex-direction: column;
-      z-index: 1000;
-    }
-
-    #wheelContainer {
-      width: 300px;
-      height: 300px;
-      border-radius: 50%;
-      background: conic-gradient(#fbbf24 0% 25%, white 25% 50%, #fbbf24 50% 75%, white 75% 100%);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      position: relative;
-      animation: spin 0s linear;
-    }
-
-    #wheelResult {
-      position: absolute;
-      top: 50%;
-      transform: translateY(-50%);
-      font-size: 2rem;
-      background: white;
-      padding: 1rem 2rem;
-      border-radius: 10px;
-      display: none;
-      z-index: 10;
-    }
-
-    #closeWheel {
-      position: absolute;
-      top: 20px;
-      right: 20px;
-      font-size: 1.5rem;
-      color: red;
-      cursor: pointer;
-      background: none;
-      border: none;
-    }
-
-    #timerText {
-      margin-top: 10px;
-      font-weight: bold;
-      color: white;
-    }
-
-    #letterSection, #phase2Screen, #phase3Letter {
-      display: none;
-      padding: 3rem;
-      text-align: center;
-    }
-
-    .envelope {
-      width: 300px;
-      height: 200px;
-      background: linear-gradient(135deg, #fbbf24, #f59e0b);
-      margin: 0 auto;
-      border-radius: 10px;
-      position: relative;
-      cursor: pointer;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      color: white;
-      font-size: 1.2rem;
-    }
-
-    .letterContent {
-      margin-top: 2rem;
-      max-width: 600px;
-      margin-left: auto;
-      margin-right: auto;
-      display: none;
-      background: white;
-      padding: 2rem;
-      border-radius: 10px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-    }
-
-    #videoPlaceholder {
-      margin-top: 2rem;
-      height: 200px;
-      background: #eee;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      color: #888;
+      left: 20px;
+      background: rgba(255, 255, 255, 0.9);
+      padding: 1.5rem;
       border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(255, 182, 193, 0.3);
+      z-index: 1001;
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 182, 193, 0.2);
     }
 
-    #welcomeSection {
-      display: none;
-      min-height: 100vh;
-      background: url('kitty-bg.jpg') repeat;
-      background-size: 300px;
-      justify-content: center;
-      align-items: center;
-      flex-direction: column;
-      padding: 2rem;
+    .admin-title {
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: #ff69b4;
+      margin-bottom: 1rem;
     }
 
-    .scrollText {
-      background: url('scroll.png') no-repeat center;
-      background-size: contain;
-      width: 700px;
-      height: 800px;
-      padding: 6rem 5rem 6rem 5rem;
-      font-family: Georgia, serif;
-      font-size: 1rem;
-      line-height: 1.7;
-      color: #3b2d1f;
-      text-align: left;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      overflow: auto;
-      text-shadow: 0 1px 1px #fff;
-    }
-
-    .scrollText div { max-width: 100%; }
-    .budget-tracker {
-      background: white;
-      padding: 1rem;
-      border-radius: 8px;
-      margin-top: 1rem;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    }
-    .budget-input {
-      display: flex;
-      gap: 0.5rem;
-      margin-top: 0.5rem;
-    }
-    .budget-input input {
-      flex: 1;
+    .admin-input {
+      width: 100%;
       padding: 0.5rem;
-      border: 1px solid #ddd;
-      border-radius: 4px;
+      border: 2px solid #ffb6c1;
+      border-radius: 8px;
+      margin-bottom: 0.5rem;
+      font-family: 'Inter', sans-serif;
     }
-    .budget-input button {
-      padding: 0.5rem 1rem;
-      background: linear-gradient(135deg, #fbbf24, #f59e0b);
+
+    .admin-btn {
+      background: linear-gradient(135deg, #ffb6c1, #ff69b4);
       color: white;
       border: none;
-      border-radius: 4px;
-      cursor: pointer;
-    }
-    .budget-remaining {
-      font-size: 1.2rem;
-      font-weight: bold;
-      color: #28a745;
-      margin-top: 0.5rem;
-    }
-    .phase-notification {
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      background: linear-gradient(135deg, #fbbf24, #f59e0b);
-      color: white;
-      padding: 1rem 2rem;
+      padding: 0.5rem 1rem;
       border-radius: 8px;
-      font-size: 1.2rem;
-      font-weight: bold;
-      z-index: 1002;
-      display: none;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      cursor: pointer;
+      font-weight: 600;
+      margin-right: 0.5rem;
+    }
+
+    .admin-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 8px rgba(255, 105, 180, 0.3);
+    }
+
+    /* Budget display */
+    #budgetDisplay {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: rgba(255, 255, 255, 0.9);
+      padding: 1rem 1.5rem;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(255, 182, 193, 0.3);
+      z-index: 1001;
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 182, 193, 0.2);
+      font-weight: 600;
+      color: #ff69b4;
     }
   </style>
 </head>
@@ -689,266 +448,73 @@
       <div class="sphere"></div>
       <div class="sphere"></div>
 
-      <!-- Navigation -->
-      <nav class="nav">
-        <div class="logo">YOUR LOGO</div>
-        <ul class="nav-links">
-          <li><a href="#">Home</a></li>
-          <li><a href="#">About</a></li>
-          <li><a href="#">Services</a></li>
-          <li><a href="#">Contact</a></li>
-        </ul>
-        <button class="sign-in-btn">Sign In</button>
-      </nav>
+      <!-- Floating Hearts -->
+      <div class="heart">💖</div>
+      <div class="heart">💕</div>
+      <div class="heart">💗</div>
+      <div class="heart">💝</div>
+
+      <!-- Sparkles -->
+      <div class="sparkle"></div>
+      <div class="sparkle"></div>
+      <div class="sparkle"></div>
+      <div class="sparkle"></div>
 
       <!-- Main Content Grid -->
       <div class="content-grid">
-        <!-- Left Section - Birthday Greeting -->
-        <div class="birthday-section">
-          <h1 class="birthday-title">
-            HAPPY <span class="highlight">BIRTHDAY</span> TO YOU
-          </h1>
-          <p class="birthday-subtitle">CONFIRM YOUR ATTENDANCE</p>
+        <!-- Left Section - Decorative -->
+        <div class="left-section">
           <div class="podium"></div>
         </div>
 
-        <!-- Right Section - Birthday Entry -->
-        <div class="entry-section">
-          <h2 class="entry-title">LET'S CELEBRATE</h2>
-          <p class="entry-subtitle">JUN-25 -2021-</p>
-          <p style="color: #6b7280; margin-bottom: 2rem; text-align: center;">
-            Enter your special day to unlock the birthday experience of a lifetime. 
-            Get ready for surprises, joy, and unforgettable memories!
-          </p>
-          
-          <form class="birthday-form" onsubmit="checkBirthday(event)">
-            <div class="form-group">
-              <input type="date" id="dob" class="form-input" required>
-            </div>
-            <button type="submit" class="submit-btn">SIGN IN</button>
-          </form>
+        <!-- Right Section - Decorative -->
+        <div class="right-section">
+          <!-- Empty for pure aesthetic -->
         </div>
       </div>
 
       <!-- Social Media Icons -->
       <div class="social-icons">
-        <a href="#" class="social-icon">📘</a>
-        <a href="#" class="social-icon">📷</a>
-        <a href="#" class="social-icon">🐦</a>
-        <a href="#" class="social-icon">💼</a>
+        <a href="#" class="social-icon">💖</a>
+        <a href="#" class="social-icon">🌸</a>
+        <a href="#" class="social-icon">✨</a>
+        <a href="#" class="social-icon">🎀</a>
       </div>
     </div>
   </div>
 
-  <!-- Hidden elements for other phases -->
-  <button id="spinBtn" style="display:none" onclick="openWheel()">➶</button>
-  
-  <!-- Debug button for testing -->
-  <button id="debugBtn" style="display:none; position: fixed; top: 80px; right: 20px; background: #ff6b6b; color: white; border: none; border-radius: 50%; width: 60px; height: 60px; cursor: pointer; z-index: 999;" onclick="manualPhaseTest()">🐛</button>
-
-  <div id="phaseNotification" class="phase-notification"></div>
-
-  <div id="wheelModal">
-    <button id="closeWheel" onclick="closeWheel()">X</button>
-    <div id="wheelContainer" onclick="spinWheel()"></div>
-    <div id="wheelResult"></div>
-    <div id="timerText"></div>
+  <!-- Admin Controls -->
+  <div id="adminControls">
+    <div class="admin-title">Admin Controls</div>
+    <input type="number" id="budgetInput" class="admin-input" placeholder="Enter budget amount" step="0.01" min="0">
+    <button class="admin-btn" onclick="setBudget()">Set Budget</button>
+    <button class="admin-btn" onclick="resetBudget()">Reset</button>
   </div>
 
-  <section id="letterSection">
-    <h2>Happy Birthday, CC!</h2>
-    <div class="envelope" onclick="openEnvelope()">Click to open your letter</div>
-    <div class="letterContent" id="letterText">
-      <p>Dear CC,</p>
-      <p>This is your special day, and there are so many surprises waiting for you! 💛</p>
-      <p>Scroll down to see what's next...</p>
-      <div id="videoPlaceholder">[ Video Placeholder ]</div>
-      <button style="margin-top:2rem" onclick="goToWelcome()">Next</button>
-    </div>
-  </section>
-
-  <section id="welcomeSection">
-    <div class="scrollText">
-      <div>
-        <strong>WELCOME TO CC'S 17TH BIRTHDAY GUIDE</strong><br><br>
-        • Throughout the day, you will unlock special letters and surprises<br>
-        • Check the top-right corner to spin the surprise wheel every hour<br>
-        • Each section may include a video, a note, or something extra magical<br>
-        • The journey is paced for fun, so take your time and enjoy 💖<br>
-        • Don't forget to smile. Today's all about you 💫<br>
-      </div>
-    </div>
-  </section>
-
-  <section id="phase2Screen" class="centered hidden">
-    <h1>YOU CAN OPEN YOUR SHOES NOW! 🎉👟</h1>
-  </section>
-
-  <section id="phase3Letter" class="centered hidden">
-    <div class="letterContent">
-      <p>Dear CC,</p>
-      <p>I hope you're enjoying the journey so far! Your next surprise is a delicious one — it's time for lunch 🥪🍓</p>
-      <p>You've earned it. Love you 💛</p>
-    </div>
-  </section>
-
-  <section id="phase4Shopping" class="centered hidden">
-    <div class="letterContent">
-      <p>Dear CC,</p>
-      <p>It's shopping time! 🎁🛍️ You have $100 to spend on whatever makes you smile. Let's make this spree unforgettable!</p>
-      <div class="budget-tracker">
-        <h3>Budget Tracker</h3>
-        <div class="budget-input">
-          <input type="number" id="purchaseAmount" placeholder="Enter purchase amount" step="0.01" min="0" />
-          <button onclick="addPurchase()">Add Purchase</button>
-        </div>
-        <div class="budget-remaining" id="budgetRemaining">$100.00 remaining</div>
-      </div>
-    </div>
-  </section>
+  <!-- Budget Display -->
+  <div id="budgetDisplay">
+    Budget: $<span id="currentBudget">100.00</span>
+  </div>
 
   <script>
-    // Constants defined at the top
-    const HER_BDAY = '2008-07-31';
-    const YOUR_BDAY = '2006-08-24';
-    
-    let lastSpinTime = null;
     let currentBudget = 100.00;
 
-    function checkBirthday(event) {
-      event.preventDefault();
-      const dob = document.getElementById('dob').value;
-      if (dob === HER_BDAY) {
-        document.querySelector('.main-container').style.display = 'none';
-        document.getElementById('spinBtn').style.display = 'block';
-        document.getElementById('debugBtn').style.display = 'block';
-        document.getElementById('letterSection').style.display = 'block';
-        fetchInitialPhase();
-        listenForPhaseChanges();
-      } else if (dob === YOUR_BDAY) {
-        window.location.href = '/admin.html';
-      } else {
-        alert("Incorrect birthday.");
+    // Load saved budget from localStorage
+    window.addEventListener('load', function() {
+      const savedBudget = localStorage.getItem('currentBudget');
+      if (savedBudget) {
+        currentBudget = parseFloat(savedBudget);
+        updateBudgetDisplay();
       }
-    }
+    });
 
-    function openEnvelope() {
-      document.getElementById('letterText').style.display = 'block';
-    }
-
-    function goToWelcome() {
-      document.getElementById('letterSection').style.display = 'none';
-      document.getElementById('welcomeSection').style.display = 'flex';
-    }
-
-    function showPhase(phase) {
-      // Hide all sections first
-      document.getElementById('welcomeSection').style.display = 'none';
-      document.getElementById('phase2Screen').style.display = 'none';
-      document.getElementById('phase3Letter').style.display = 'none';
-      document.getElementById('phase4Shopping').style.display = 'none';
-      
-      // Show the appropriate section
-      if (phase === 2) {
-        document.getElementById('phase2Screen').style.display = 'flex';
-        showPhaseNotification('Phase 2: You can open your shoes now! 🎉');
-      } else if (phase === 3) {
-        document.getElementById('phase3Letter').style.display = 'flex';
-        showPhaseNotification('Phase 3: Lunch time! 🍽️');
-      } else if (phase === 4) {
-        document.getElementById('phase4Shopping').style.display = 'flex';
-        showPhaseNotification('Phase 4: Shopping time! 🛍️');
-      } else {
-        // Default to welcome section
-        document.getElementById('welcomeSection').style.display = 'flex';
-      }
-    }
-
-    function showPhaseNotification(message) {
-      const notification = document.getElementById('phaseNotification');
-      notification.innerText = message;
-      notification.style.display = 'block';
-      
-      // Hide notification after 3 seconds
-      setTimeout(() => {
-        notification.style.display = 'none';
-      }, 3000);
-    }
-
-    function fetchInitialPhase() {
-      // Listen for Firebase phase changes
-      firebase.database().ref('phase').on('value', (snapshot) => {
-        const phase = snapshot.val() || 1;
-        console.log('Firebase phase update:', phase);
-        showPhase(phase);
-      });
-    }
-
-    function listenForPhaseChanges() {
-      // Firebase real-time listener is already set up in fetchInitialPhase
-      console.log('Firebase real-time listener active');
-    }
-
-    function manualPhaseTest() {
-      const phases = [1, 2, 3, 4];
-      const currentPhase = phases.find(phase => {
-        const element = document.querySelector(`#phase${phase === 1 ? '2Screen' : phase === 2 ? '2Screen' : phase === 3 ? '3Letter' : '4Shopping'}`);
-        return element && element.style.display === 'flex';
-      }) || 1;
-      
-      const nextPhase = currentPhase === 4 ? 1 : currentPhase + 1;
-      showPhase(nextPhase);
-      showPhaseNotification(`Manual test: Phase ${nextPhase}`);
-    }
-
-    function openWheel() {
-      const now = Date.now();
-      const hour = 1000 * 60 * 60; // 1 hour in milliseconds
-      
-      // Check if we can spin (respect 1-hour rule even if late)
-      if (lastSpinTime && (now - lastSpinTime) < hour) {
-        const remainingTime = hour - (now - lastSpinTime);
-        const remainingMinutes = Math.ceil(remainingTime / (1000 * 60));
-        document.getElementById('timerText').innerText = `You can spin again in ${remainingMinutes} minutes`;
-        document.getElementById('wheelModal').style.display = 'flex';
-        return;
-      }
-      
-      document.getElementById('timerText').innerText = '';
-      document.getElementById('wheelModal').style.display = 'flex';
-    }
-
-    function spinWheel() {
-      const prizes = ['Letter A', 'Letter B', 'Letter C', 'Bonus Surprise'];
-      const result = prizes[Math.floor(Math.random() * prizes.length)];
-      const resultBox = document.getElementById('wheelResult');
-      resultBox.innerText = result;
-      resultBox.style.display = 'block';
-      lastSpinTime = Date.now();
-      
-      // Save spin time to localStorage
-      localStorage.setItem('lastSpinTime', lastSpinTime);
-      
-      setTimeout(() => {
-        resultBox.style.display = 'none';
-      }, 10000);
-    }
-
-    function closeWheel() {
-      document.getElementById('wheelModal').style.display = 'none';
-    }
-
-    function addPurchase() {
-      const input = document.getElementById('purchaseAmount');
+    function setBudget() {
+      const input = document.getElementById('budgetInput');
       const value = parseFloat(input.value);
       
-      if (!isNaN(value) && value > 0) {
-        currentBudget -= value;
-        currentBudget = Math.max(0, currentBudget);
-        
-        // Save to localStorage
-        localStorage.setItem('remainingBudget', currentBudget);
-        
+      if (!isNaN(value) && value >= 0) {
+        currentBudget = value;
+        localStorage.setItem('currentBudget', currentBudget.toString());
         updateBudgetDisplay();
         input.value = '';
       } else {
@@ -956,20 +522,15 @@
       }
     }
 
-    function updateBudgetDisplay() {
-      const budgetElement = document.getElementById('budgetRemaining');
-      if (budgetElement) {
-        budgetElement.innerText = `$${currentBudget.toFixed(2)} remaining`;
-      }
+    function resetBudget() {
+      currentBudget = 100.00;
+      localStorage.setItem('currentBudget', currentBudget.toString());
+      updateBudgetDisplay();
     }
 
-    // Load saved spin time on page load
-    window.addEventListener('load', function() {
-      const savedSpinTime = localStorage.getItem('lastSpinTime');
-      if (savedSpinTime) {
-        lastSpinTime = parseInt(savedSpinTime);
-      }
-    });
+    function updateBudgetDisplay() {
+      document.getElementById('currentBudget').textContent = currentBudget.toFixed(2);
+    }
   </script>
 </body>
 </html>
